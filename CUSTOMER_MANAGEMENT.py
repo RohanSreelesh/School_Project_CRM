@@ -8,7 +8,13 @@ def add():
     window.configure(bg='pink')
     lblTitle = Label(window, text="ADD CUSTOMER",font = "Arial,12",bg = "Yellow")
     lblTitle.pack()
-
+    
+    lblsales_id= Label(window, text='Enter unique salesman id')
+    lblsales_id.place(x=30,y=20)
+    
+    entrysales_id= Entry(window)
+    entrysales_id.place(x=160,y=20)
+    
     lblcust_id = Label(window, text="Enter Customer Id")
     lblcust_id.place(x = 30,y = 50)
 
@@ -50,8 +56,9 @@ def add():
 
     entrypayment_mode = Entry(window)
     entrypayment_mode.place(x = 160,y = 230)
-
+    
     def Save():
+        sales_id = entrysales_id.get()
         cust_id = entrycust_id.get()
         name = entryname.get()
         ph_no = entryph_no.get()
@@ -61,11 +68,11 @@ def add():
         payment_mode = entrypayment_mode.get()
 
         print(cust_id, name, ph_no, email, gender, address, payment_mode)
-        sql = "insert into customer values('{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(cust_id, name, ph_no,
+        sql = "insert into customer values('{}','{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(sales_id,cust_id, name, ph_no,
                                                                                              email, gender, address,
                                                                                              payment_mode)
 
-        sql_connection = mysql.connect(user="root", password="Rohan2002", host="localhost", database="project",auth_plugin='mysql_native_password')
+        sql_connection = mysql.connect(user="root", password="", host="localhost", database="project",auth_plugin='mysql_native_password')
 
 
         cursor = sql_connection.cursor()
@@ -104,7 +111,7 @@ def update():
          print(name, email)
          sql = "update customer set name='{}' where email='{}'".format(name, email)
 
-         sql_connection = mysql.connect(user="root", password="Rohan2002", host="localhost", database="project",auth_plugin='mysql_native_password')
+         sql_connection = mysql.connect(user="root", password="", host="localhost", database="project",auth_plugin='mysql_native_password')
 
          cursor = sql_connection.cursor()
          cursor.execute(sql)
@@ -139,7 +146,7 @@ def update():
          print(ph_no, name)
          sql = "update customer set ph_no='{}' where name='{}'".format(ph_no, name)
 
-         sql_connection = mysql.connect(user="root", password="Rohan2002", host="localhost", database="project", auth_plugin='mysql_native_password')
+         sql_connection = mysql.connect(user="root", password="", host="localhost", database="project", auth_plugin='mysql_native_password')
 
          cursor = sql_connection.cursor()
          cursor.execute(sql)
@@ -175,7 +182,7 @@ def update():
             print(email, name)
             sql = "update customer set email='{}' where name='{}'".format(email, name)
 
-            sql_connection = mysql.connect(user="root", password="Rohan2002", host="localhost", database="project",auth_plugin='mysql_native_password')
+            sql_connection = mysql.connect(user="root", password="", host="localhost", database="project",auth_plugin='mysql_native_password')
 
             cursor = sql_connection.cursor()
             cursor.execute(sql)
@@ -211,7 +218,7 @@ def update():
             print(address, name)
             sql = "update customer set address='{}' where name='{}'".format(address, name)
 
-            sql_connection = mysql.connect(user="root", password="Rohan2002", host="localhost", database="project",
+            sql_connection = mysql.connect(user="root", password="", host="localhost", database="project",
                           auth_plugin='mysql_native_password')
 
             cursor = sql_connection.cursor()
@@ -248,7 +255,7 @@ def update():
             print(payment_mode, name)
             sql = "update customer set payment_mode='{}' where name='{}'".format(payment_mode, name)
 
-            sql_connection= mysql.connect(user="root", password="Rohan2002", host="localhost", database="project",
+            sql_connection= mysql.connect(user="root", password="", host="localhost", database="project",
                           auth_plugin='mysql_native_password')
 
             cursor = sql_connection.cursor()
@@ -297,7 +304,7 @@ def delete():
       print(name)
 
       sql = "delete from customer where name = '{}'".format(name)
-      sql_connection= mysql.connect(user="root", password="Rohan2002", host="localhost", database="project",
+      sql_connection= mysql.connect(user="root", password="", host="localhost", database="project",
                     auth_plugin='mysql_native_password')
 
       cursor = sql_connection.cursor()
@@ -323,7 +330,7 @@ def view():
         print(name)
 
         sql = "select * from customer where name = '{}'".format(name)
-        mysql.connect(user="root", password="Rohan2002", host="localhost", database="project",
+        sql_connection=mysql.connect(user="root", password="", host="localhost", database="project",
                       auth_plugin='mysql_native_password')
 
         cursor = sql_connection.cursor()
@@ -338,7 +345,7 @@ def view():
 def view_all():
     sql = "select * from customer"
 
-    mysql.connect(user="root", password="Rohan2002", host="localhost", database="project",
+    sql_connection= mysql.connect(user="root", password="", host="localhost", database="project",
                   auth_plugin='mysql_native_password')
 
     cursor = sql_connection.cursor()
