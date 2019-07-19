@@ -578,8 +578,10 @@ def delete_leads():
 
     Button(root, text="Delete", command=DeleteIt_leads).pack(side=BOTTOM)
     root.mainloop()
-def view_leads()
-def view_all_leads()
+def view_leads():
+    pass
+def view_all_leads():
+    pass
 #both are same as customer only small changes
 def selection():
     win = Tk()
