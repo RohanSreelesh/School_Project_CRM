@@ -1,6 +1,9 @@
 from tkinter import *
-
+from tkinter import messagebox
 import mysql.connector as mysql
+
+
+userdict={'admin':'1234','avig':'1234','rishabh':'9999','rohan':'888'}
 
 def add():
     window = Tk()
@@ -8,9 +11,16 @@ def add():
     window.configure(bg='pink')
     lblTitle = Label(window, text="ADD CUSTOMER",font = "Arial,12",bg = "Yellow")
     lblTitle.pack()
+    lblsales_id = Label(window, text='Enter unique salesman id')
 
+    lblsales_id.place(x=30, y=20)
+
+    entrysales_id = Entry(window)
+
+    entrysales_id.place(x=160, y=20)
     lblcust_id = Label(window, text="Enter Customer Id")
     lblcust_id.place(x = 30,y = 50)
+
 
     entrycust_id = Entry(window)
     entrycust_id.place(x = 160, y = 50)
@@ -45,25 +55,26 @@ def add():
     entryaddress = Entry(window)
     entryaddress.place(x = 160,y = 200)
 
-    lblpayment_mode = Label(window, text="Enter Payment Mode")
+    lblpayment_mode = Label(window, text="Enter Value")
     lblpayment_mode.place(x = 30,y = 230)
 
     entrypayment_mode = Entry(window)
     entrypayment_mode.place(x = 160,y = 230)
 
-    def Save():
+    def Save(): #for orders
+        sales_id= entrysales_id.get()
         cust_id = entrycust_id.get()
         name = entryname.get()
         ph_no = entryph_no.get()
         email = entryemail.get()
         gender = entrygender.get()
         address = entryaddress.get()
-        payment_mode = entrypayment_mode.get()
+        value = entrypayment_mode.get()
 
-        print(cust_id, name, ph_no, email, gender, address, payment_mode)
-        sql = "insert into customer values('{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(cust_id, name, ph_no,
+        print(sales_id,cust_id, name, ph_no, email, gender, address, payment_mode)
+        sql = "insert into customer values('{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(sales_id,cust_id, name, ph_no,
                                                                                              email, gender, address,
-                                                                                             payment_mode)
+                                                                                             value)
 
         sql_connection = mysql.connect(user="root", password="Rohan2002", host="localhost", database="project",auth_plugin='mysql_native_password')
 
@@ -347,21 +358,246 @@ def view_all():
     for row in rows:
         print(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
 
+def customer_all():
+    win = Tk()
+    win.geometry("300x170")
+    win.configure(bg='bisque')
+    lblTitle = Label(win, text="SELECT YOUR CHOICE!!!!",font = "Arial,16",bg = "Yellow")
+    lblTitle.pack()
+    b1 = Button(win, text=" Add Customer", command=add,fg = "red")
+    b2 = Button(win, text="Update Customer", command=update,fg = "purple")
+    b3 = Button(win, text="Delete Customer", command=delete,fg = "orange")
+    b4 = Button(win, text="View Customer", command=view,fg = "green")
+    b5 = Button(win, text="View All Customers", command=view_all,fg = "blue")
+    b1.pack()
+    b2.pack()
+    b3.pack()
+    b4.pack()
+    b5.pack()
 
-win = Tk()
-win.geometry("300x170")
-win.configure(bg='bisque')
-lblTitle = Label(win, text="SELECT YOUR CHOICE!!!!",font = "Arial,16",bg = "Yellow")
-lblTitle.pack()
-b1 = Button(win, text=" Add Customer", command=add,fg = "red")
-b2 = Button(win, text="Update Customer", command=update,fg = "purple")
-b3 = Button(win, text="Delete Customer", command=delete,fg = "orange")
-b4 = Button(win, text="View Customer", command=view,fg = "green")
-b5 = Button(win, text="View All Customers", command=view_all,fg = "blue")
-b1.pack()
-b2.pack()
-b3.pack()
-b4.pack()
-b5.pack()
+    win.mainloop()
 
-win.mainloop()
+def view_sales():
+    root2 = Tk()
+
+    lblsales_id = Label(root2, text="Enter Your Sales ID")
+    lblsales_id.pack()
+
+    entrysales_id = Entry(root2)
+    entrysales_id.pack()
+    def ShowIt():
+        sales_id = entrysales_id.get()
+        print(sales_id)
+
+        sql = "select * from customer where sales_id = '{}'".format(sales_id)
+        sql_connection = mysql.connect(user="root", password="igts2123", host="DESKTOP-U9LP2BM", database="project",auth_plugin='mysql_native_password')
+
+        cursor = sql_connection.cursor()
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        print(rows)
+        total=0
+        for i in rows:
+            total+=i
+        print('Gross Sales:',total)
+
+    Button(root2, text="Show", command=ShowIt).pack(side=BOTTOM)
+    root2.mainloop()
+
+def login():
+    global loginwindow,usernameentry,passwordentry
+    # this label notifies progress find a way so that it does not stack
+    lbupdate = Label(loginwindow, text="loading", font="Arial,12", bg="Yellow").pack()
+
+    user = usernameentry.get()
+
+    password = passwordentry.get()
+
+    userlist = list(userdict.keys())
+
+    if user == userlist[0]:
+
+        if userdict[user] == password:
+
+            messagebox.showinfo("SUCCESS", "WELCOME BACK BOSS")
+
+            loginwindow.destroy()
+
+            #customer_all()
+            selection()
+
+        else:
+
+            lbupdate = Label(loginwindow, text="wrong password", font="Arial,12", bg="Yellow").pack()
+
+    elif user in userlist:
+
+        if userdict[user] == password:
+
+            messagebox.showinfo("SUCCESS", "WELCOME BACK " + user)
+
+            loginwindow.destroy()
+
+            #customer_all()
+            selection()
+        else:
+
+            lbupdate = Label(loginwindow, text="wrong password", font="Arial,12", bg="Yellow").pack()
+    else:
+
+        lbupdate = Label(loginwindow, text="wrong username", font="Arial,12", bg="Yellow").pack()
+
+    loginwindow.mainloop()
+
+# login page starts here label and entry ko side by side kar de
+def login_front():
+    global loginwindow, usernameentry, passwordentry
+    loginwindow = Tk()
+
+    loginwindow.geometry("300x170")
+
+    loginwindow.configure(bg='bisque')
+
+    lbluser = Label(loginwindow, text="ENTER USERNAME", font="Arial,12", bg="Yellow")
+
+    lbluser.pack()
+
+    usernameentry = Entry(loginwindow)
+
+    usernameentry.pack()
+
+    lbpass = Label(loginwindow, text="ENTER PASSWORD", font="Arial,12", bg="Yellow").pack()
+
+    passwordentry = Entry(loginwindow)
+
+    passwordentry.pack()
+
+    loginbutton = Button(loginwindow, text="LOGIN", command=login, fg="blue")
+
+    loginbutton.pack()
+
+    loginwindow.mainloop()
+
+
+def selection_leads():
+    win = Tk()
+    win.geometry("300x170")
+    win.configure(bg='bisque')
+    lblTitle = Label(win, text="SELECT YOUR CHOICE!!!!", font="Arial,16", bg="Yellow")
+    lblTitle.pack()
+    b1 = Button(win, text="Add Leads", command=add_leads, fg="red")
+    b3 = Button(win, text="Delete Leads", command=delete_leads, fg="orange")
+    b4 = Button(win, text="View Lead", command=view_leads, fg="green")
+    b5 = Button(win, text="View All Leads", command=view_all_leads, fg="blue")
+    b1.pack()
+    b3.pack()
+    b4.pack()
+    b5.pack()
+
+
+def add_leads():
+    window= Tk()
+    window.geometry('300x170')
+    window.configure(bg='pink')
+    lb_title= Label(window,text='Name',font = "Arial,12",bg = "Yellow")
+    lb_title.pack()
+
+    lbname = Label(window, text='Name')
+
+    lbname.place(x=30, y=20)
+
+    entry_lbname = Entry(window)
+
+    entry_lbname.place(x=160, y=20)
+    lblcategory = Label(window, text="Category")
+    lblcategory.place(x=30, y=50)
+
+    entry_lblcategory = Entry(window)
+    entry_lblcategory.place(x=160, y=50)
+
+    lblph_no = Label(window, text="Phone number")
+    lblph_no.place(x=30, y=80)
+
+    entry_lblph_no = Entry(window)
+    entry_lblph_no.place(x=160, y=80)
+
+    lbl_meet = Label(window, text="Next meeting")#put date picker here
+    lbl_meet.place(x=30, y=110)
+
+    entry_lbl_meet = Entry(window)
+    entry_lbl_meet.place(x=160, y=110)
+    def Save(): #for orders
+        name= entry_lbname.get()
+        category = entry_lblcategory.get()
+        phone = entry_lblph_no.get()
+        meet = entry_lbl_meet.get()
+
+
+        print(name,category,phone,meet)
+        sql = "insert into leads values('{}', '{}', '{}', '{}')".format(name,category,phone,meet)
+
+
+        sql_connection = mysql.connect(user="root", password="Rohan2002", host="localhost", database="project",auth_plugin='mysql_native_password')
+
+
+        cursor = sql_connection.cursor()
+        cursor.execute(sql)
+
+        sql_connection.commit()
+
+        print(name, " Saved in DataBase")
+
+
+    Button(window, text="Save", command=Save).pack(side=BOTTOM)
+    window.mainloop()
+
+def delete_leads():
+    root = Tk()
+
+    lblTitle = Label(root, text="Enter Name",font = "Arial,16",bg = "Yellow")
+    lblTitle.pack()
+
+    lblname = Label(root, text="Enter Lead Name")
+    lblname.pack()
+
+    entryname = Entry(root)
+    entryname.pack()
+
+    def DeleteIt_leads():
+      name = entryname.get()
+      print(name)
+
+      sql = "delete from leads where name = '{}'".format(name)
+      sql_connection= mysql.connect(user="root", password="Rohan2002", host="localhost", database="project",
+                    auth_plugin='mysql_native_password')
+
+      cursor = sql_connection.cursor()
+      cursor.execute(sql)
+      sql_connection.commit()
+      print(name, " Delete from DataBase")
+
+    Button(root, text="Delete", command=DeleteIt_leads).pack(side=BOTTOM)
+    root.mainloop()
+def view_leads()
+def view_all_leads()
+#both are same as customer only small changes
+def selection():
+    win = Tk()
+    win.geometry("300x170")
+    win.configure(bg='bisque')
+    lblTitle = Label(win, text="SELECT YOUR CHOICE!!!!", font="Arial,16", bg="Yellow")
+    lblTitle.pack()
+    b1 = Button(win, text=" Leads", command=selection_leads, fg="red")
+    b2 = Button(win, text="Orders", command=customer_all, fg="purple")
+    b1.pack()
+    b2.pack()
+
+    win.mainloop()
+
+
+
+
+
+
+
+login_front()
