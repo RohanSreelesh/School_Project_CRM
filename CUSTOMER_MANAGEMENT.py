@@ -717,7 +717,22 @@ def update_salesman():
     userdict=p.load(f)
     
     
-
+def import_userdict():
+    global userdict
+    f=open('users','rb')
+    userdict=p.load(f)
+    f.close()
+    
+def createuserfile():
+    userdict={'admin':'1234'}
+    f=open('users','wb')
+    userdict=p.dump(userdict,f)
+    f.flush()
+    f.close()
+createuserfile()
+import_userdict()
+print(userdict)    
+    
 
 
 def manager_page():
