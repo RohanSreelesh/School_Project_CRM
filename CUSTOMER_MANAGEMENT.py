@@ -662,7 +662,6 @@ def add_salesman():
     entrypassword = Entry(win)
     entrypassword.pack()
     def process():
-    
         key=entrykey.get()
         password=entrypassword.get()
         f = open('users', 'rb+')
@@ -672,10 +671,8 @@ def add_salesman():
         else:
             userdict[key] = password
             f.seek(0)
-    
             p.dump(userdict, f)
-            return 'EMPLOYEE ADDED:', userdict
-    
+            print('EMPLOYEE ADDED:', userdict)
         f.flush()
         f.close()
     Button(win, text='add',command=process).pack()
