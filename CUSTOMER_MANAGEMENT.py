@@ -2,42 +2,53 @@ from tkinter import *
 from tkinter import messagebox
 import mysql.connector as mysql
 import pickle as p
+import matplotlib.pyplot as plt
+import numpy as np
+mysql_password = '1234'
+hostname = 'localhost'
 
-mysql_password=''
+
+def createuserfile():
+    userdict = {'admin': '1234', 'avig': '1234', 'rohan': '1234', 'rishabh': '1234'}
+    f = open('users', 'wb+')
+    p.dump(userdict, f)
+    f.flush()
+    f.close()
+
+
+with open('check.txt', 'w+') as f1:
+    if f1.read() == '1':
+        pass
+    else:
+        createuserfile()
+        f1.write('1')
+
 
 def import_userdict():
     global userdict
-    f = open('users', 'rb')
+    f = open('users', 'rb+')
     userdict = p.load(f)
     f.close()
 
 
 import_userdict()
 
-sql_connection = mysql.connect(user="root", password=mysql_password, host="localhost",auth_plugin='mysql_native_password')
+sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                               port=3306, auth_plugin='mysql_native_password')
 
-cursor_main=sql_connection.cursor()
+cursor_main = sql_connection.cursor()
 
 cursor_main.execute('create database if not exists project')
 
 cursor_main.execute('use project;')
 
-cursor_main.execute('create table if not exists customer (sales_id varchar(10),cust_id varchar(10),name varchar(100) ,phone_no varchar(10),email varchar(100),gender varchar(6),address varchar(500),mode varchar(10),value varchar(10));')
+cursor_main.execute('create table if not exists customer (sales_id varchar(10),cust_id varchar(10),name varchar(100) '
+                    ',phone_no varchar(10),email varchar(100),gender varchar(6),address varchar(500),mode varchar('
+                    '10),value varchar(10));')
 
-cursor_main.execute('create table if not exists leads (name varchar(50),category varchar(50),phone_no varchar(10) ,next_meeting varchar(30));')
+cursor_main.execute('create table if not exists leads (name varchar(50),category varchar(50),phone_no varchar(10) ,'
+                    'next_meeting varchar(30));')
 
-def createuserfile():
-    userdict={'admin':'1234','avig':'1234','rohan':'1234','rishabh':'1234'}
-    f=open('users','wb')
-    userdict=p.dump(userdict,f)
-    f.flush()
-    f.close()
-with open('check.txt','a+') as f1:
-    if f1.read()=='1':
-        pass
-    else:
-        createuserfile()
-        f1.write('1')
 
 def add():
     window = Tk()
@@ -50,7 +61,7 @@ def add():
 
     entrysales_id = Entry(window)
     entrysales_id.place(x=160, y=20)
-    
+
     lblcust_id = Label(window, text="Enter Customer Id")
     lblcust_id.place(x=10, y=50)
 
@@ -111,14 +122,15 @@ def add():
         value = entrypayment.get()
 
         print(sales_id, cust_id, name, ph_no, email, gender, address, mode, value)
-        sql = "insert into customer values('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(sales_id, cust_id,
-                                                                                                   name, ph_no,
-                                                                                                   email, gender,
-                                                                                                   address, mode,
-                                                                                                   value)
+        sql = "insert into customer values('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(sales_id,
+                                                                                                         cust_id,
+                                                                                                         name, ph_no,
+                                                                                                         email, gender,
+                                                                                                         address, mode,
+                                                                                                         value)
 
-        sql_connection = mysql.connect(user="root", password=mysql_password, host="localhost", database="project",
-                                       auth_plugin='mysql_native_password')
+        sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                       database='project', port=3306, auth_plugin='mysql_native_password')
 
         cursor = sql_connection.cursor()
         cursor.execute(sql)
@@ -156,8 +168,8 @@ def update():
             print(name, email)
             sql = "update customer set name='{}' where email='{}'".format(name, email)
 
-            sql_connection = mysql.connect(user="root", password=mysql_password, host="localhost", database="project",
-                                           auth_plugin='mysql_native_password')
+            sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                           database='project', port=3306, auth_plugin='mysql_native_password')
 
             cursor = sql_connection.cursor()
             cursor.execute(sql)
@@ -193,8 +205,8 @@ def update():
             print(ph_no, name)
             sql = "update customer set ph_no='{}' where name='{}'".format(ph_no, name)
 
-            sql_connection = mysql.connect(user="root", password=mysql_password, host="localhost", database="project",
-                                           auth_plugin='mysql_native_password')
+            sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                           database='project', port=3306, auth_plugin='mysql_native_password')
 
             cursor = sql_connection.cursor()
             cursor.execute(sql)
@@ -230,8 +242,8 @@ def update():
             print(email, name)
             sql = "update customer set email='{}' where name='{}'".format(email, name)
 
-            sql_connection = mysql.connect(user="root", password=mysql_password, host="localhost", database="project",
-                                           auth_plugin='mysql_native_password')
+            sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                           database='project', port=3306, auth_plugin='mysql_native_password')
 
             cursor = sql_connection.cursor()
             cursor.execute(sql)
@@ -267,8 +279,8 @@ def update():
             print(address, name)
             sql = "update customer set address='{}' where name='{}'".format(address, name)
 
-            sql_connection = mysql.connect(user="root", password=mysql_password, host="localhost", database="project",
-                                           auth_plugin='mysql_native_password')
+            sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                           database='project', port=3306, auth_plugin='mysql_native_password')
 
             cursor = sql_connection.cursor()
             cursor.execute(sql)
@@ -304,8 +316,8 @@ def update():
             print(payment_mode, name)
             sql = "update customer set payment_mode='{}' where name='{}'".format(payment_mode, name)
 
-            sql_connection = mysql.connect(user="root", password=mysql_password, host="localhost", database="project",
-                                           auth_plugin='mysql_native_password')
+            sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                           database='project', port=3306, auth_plugin='mysql_native_password')
 
             cursor = sql_connection.cursor()
             cursor.execute(sql)
@@ -354,8 +366,8 @@ def delete():
         print(name)
 
         sql = "delete from customer where name = '{}'".format(name)
-        sql_connection = mysql.connect(user="root", password=mysql_password, host="localhost", database="project",
-                                       auth_plugin='mysql_native_password')
+        sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                       database='project', port=3306, auth_plugin='mysql_native_password')
 
         cursor = sql_connection.cursor()
         cursor.execute(sql)
@@ -380,8 +392,8 @@ def view():
         print(name)
 
         sql = "select * from customer where name = '{}'".format(name)
-        sql_connection = mysql.connect(user="root", password=mysql_password, host="localhost", database="project",
-                                       auth_plugin='mysql_native_password')
+        sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                       database='project', port=3306, auth_plugin='mysql_native_password')
 
         cursor = sql_connection.cursor()
         cursor.execute(sql)
@@ -396,8 +408,8 @@ def view():
 def view_all():
     sql = "select * from customer"
 
-    sql_connection = mysql.connect(user="root", password=mysql_password, host="localhost", database="project",
-                                   auth_plugin='mysql_native_password')
+    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                   database='project', port=3306, auth_plugin='mysql_native_password')
 
     cursor = sql_connection.cursor()
     cursor.execute(sql)
@@ -417,19 +429,19 @@ def view_sales():
 
     def ShowIt():
         sales_id = entrysales_id.get()
-        print(sales_id,':checking sales id')
+        print(sales_id, ':checking sales id')
 
         sql = "select value from customer where sales_id = '{}'".format(sales_id)
-        sql_connection = mysql.connect(user="root", password=mysql_password, host="localhost", database="project",
-                                       auth_plugin='mysql_native_password')
+        sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                       database='project', port=3306, auth_plugin='mysql_native_password')
 
         cursor = sql_connection.cursor()
         cursor.execute(sql)
         rows = cursor.fetchall()
-        sales_list=[x[0] for x in rows]
-        sales_list=list(map(int, sales_list))
+        sales_list = [x[0] for x in rows]
+        sales_list = list(map(int, sales_list))
         print(sales_list)
-        total=sum(sales_list)
+        total = sum(sales_list)
         print('Gross Sales:', total)
 
     Button(root2, text="Show", command=ShowIt).pack(side=BOTTOM)
@@ -561,7 +573,7 @@ def add_leads():
 
     entry_lbname = Entry(window)
     entry_lbname.place(x=160, y=20)
-    
+
     lblcategory = Label(window, text="Category")
     lblcategory.place(x=10, y=50)
 
@@ -589,8 +601,8 @@ def add_leads():
         print(name, category, phone, meet)
         sql = "insert into leads values('{}', '{}', '{}', '{}')".format(name, category, phone, meet)
 
-        sql_connection = mysql.connect(user="root", password=mysql_password, host="localhost", database="project",
-                                       auth_plugin='mysql_native_password')
+        sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                       database='project', port=3306, auth_plugin='mysql_native_password')
 
         cursor = sql_connection.cursor()
         cursor.execute(sql)
@@ -620,8 +632,8 @@ def delete_leads():
         print(name)
 
         sql = "delete from leads where name = '{}'".format(name)
-        sql_connection = mysql.connect(user="root", password=mysql_password, host="localhost", database="project",
-                                       auth_plugin='mysql_native_password')
+        sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                       database='project', port=3306, auth_plugin='mysql_native_password')
 
         cursor = sql_connection.cursor()
         cursor.execute(sql)
@@ -646,8 +658,8 @@ def view_leads():
         print(name)
 
         sql = "select * from leads where name = '{}'".format(name)
-        sql_connection = mysql.connect(user="root", password=mysql_password, host="localhost", database="project",
-                                       auth_plugin='mysql_native_password')
+        sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                       database='project', port=3306, auth_plugin='mysql_native_password')
 
         cursor = sql_connection.cursor()
         cursor.execute(sql)
@@ -662,8 +674,8 @@ def view_leads():
 def view_all_leads():
     sql = "select * from leads"
 
-    sql_connection = mysql.connect(user="root", password=mysql_password, host="localhost", database="project",
-                                   auth_plugin='mysql_native_password')
+    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                   database='project', port=3306, auth_plugin='mysql_native_password')
 
     cursor = sql_connection.cursor()
     cursor.execute(sql)
@@ -676,15 +688,16 @@ def add_salesman():
     win = Tk()
     win.geometry("400x400")
     win.configure(bg='bisque')
-    Label(win, text="Enter Employee Name", bg='Yellow' , fg='red').pack()
+    Label(win, text="Enter Employee Name", bg='Yellow', fg='red').pack()
     entrykey = Entry(win)
     entrykey.pack()
     Label(win, text='Enter password', bg='yellow', fg='red').pack()
     entrypassword = Entry(win)
     entrypassword.pack()
+
     def process():
-        key=entrykey.get()
-        password=entrypassword.get()
+        key = entrykey.get()
+        password = entrypassword.get()
         f = open('users', 'rb+')
         userdict = p.load(f)
         if key in userdict.keys():
@@ -696,83 +709,130 @@ def add_salesman():
             print('EMPLOYEE ADDED:', userdict)
         f.flush()
         f.close()
-    Button(win, text='add',command=process).pack()
+
+    Button(win, text='add', command=process).pack()
     win.mainloop()
 
+
 def update_salesman():
-    update=Tk()
+    update = Tk()
     update.geometry("400x400")
     update.configure(bg='bisque')
     Label(update, text='UPDATE MENU', bg='Yellow', fg='red').pack()
-    lblold=Label(update, text='enter old username which has to be changed')
+    lblold = Label(update, text='enter old username which has to be changed')
     lblold.pack()
-    entryold=Entry(update)
+    entryold = Entry(update)
     entryold.pack()
-    f=open('users','rb+')
-    userdict=p.load(f)
+    f = open('users', 'rb+')
+    userdict = p.load(f)
+
     def update_user():
-        update1=Tk()
+        global process
+        update1 = Tk()
         update1.geometry("400x400")
         update1.configure(bg='bisque')
-        old=entryold.get()
+        old = entryold.get()
         if old in list(userdict.keys()):
-            lblold=Label(update1, text='enter new username which has to be added')
+            lblold = Label(update1, text='enter new username which has to be added')
             lblold.pack()
-            entrynew=Entry(update1)
+            entrynew = Entry(update1)
             entrynew.pack()
+
             def process():
                 if entrynew.get() in list(userdict.keys()):
                     print('This user already exists')
                 else:
-                    password=userdict[old]
+                    password = userdict[old]
                     del userdict[old]
-                    userdict[entrynew.get()]=password
+                    userdict[entrynew.get()] = password
                     f.seek(0)
-                    p.dump(userdict,f)
+                    p.dump(userdict, f)
                     f.close()
                     print(userdict)
         else:
             print('username does not exist')
-        Button(update1, text='done',command=process).pack()
+        Button(update1, text='done', command=process).pack()
+
     def update_password():
-        update2=Tk()
+        global process2
+        update2 = Tk()
         update2.geometry("400x400")
         update2.configure(bg='bisque')
-        old=entryold.get()
+        old = entryold.get()
         if old in list(userdict.keys()):
-            lblpassnew=Label(update2, text='enter new password which has to be changed')
+            lblpassnew = Label(update2, text='enter new password which has to be changed')
             lblpassnew.pack()
-            entrynew=Entry(update2)
+            entrynew = Entry(update2)
             entrynew.pack()
-            def process():
-                userdict[old]=entrynew.get()
+
+            def process2():
+                userdict[old] = entrynew.get()
                 f.seek(0)
-                p.dump(userdict,f)
+                p.dump(userdict, f)
                 f.close()
                 print('success')
                 print(userdict)
-        else:    
+        else:
             print('username does not exist')
-        Button(update2, text='done',command=process).pack()
+        Button(update2, text='done', command=process2).pack()
+
     Button(update, text='update user', command=update_user).pack()
-    Button(update, text='update password',command=update_password).pack()
+    Button(update, text='update password', command=update_password).pack()
+
 
 def fire_salesman():
-    update3=Tk()
+    update3 = Tk()
     update3.geometry("400x400")
     update3.configure(bg='bisque')
     Label(update3, text='FIRE!!!', bg='Yellow', fg='red').pack()
-    lblold=Label(update3, text='Enter Employee who has to be fired')
+    lblold = Label(update3, text='Enter Employee who has to be fired')
     lblold.pack()
-    entryold=Entry(update3)
+    entryold = Entry(update3)
     entryold.pack()
+
     def process():
         if entryold.get() in list(userdict.keys()):
             del userdict[entryold.get()]
             return 'Employee fired successfully!. Nice job!'
         else:
             return 'Employee doesnt exist'
+
     Button(update3, text='Fire!!!', command=process, bg='black', fg='red').pack()
+
+def plots():
+    total_sales_list=[]
+    total_sales_list_final=[]
+    id_list_final=[]
+    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                   database='project', port=3306, auth_plugin='mysql_native_password')
+    cursor = sql_connection.cursor()
+
+    cursor.execute('select sales_id from customer')
+    id_list= [x[0] for x in cursor.fetchall()]
+    for i in id_list:
+        if i not in id_list_final:
+            id_list_final.append(i)
+    id_list_final=list(map(int, id_list_final))
+    print(id_list_final)
+
+    for i in id_list:
+        cursor.execute("select value from customer where sales_id='{}'".format(i))
+        rows = cursor.fetchall()
+        sales_list = [x[0] for x in rows]
+        sales_list = list(map(int, sales_list))
+        total = sum(sales_list)
+        total_sales_list.append(total)
+    for i in total_sales_list:
+        if i not in total_sales_list_final:
+            total_sales_list_final.append(i)
+    print(total_sales_list_final)
+
+    plt.bar(np.arange(len(id_list_final)),total_sales_list_final, align='center', alpha=0.5)
+    plt.xticks(np.arange(len(id_list_final)),id_list_final)
+    plt.ylabel('Total Sale in Rupees')
+    plt.xlabel('Sales ID of salesman')
+    plt.title('Total sales of each Salesman')
+    plt.show()
 def manager_page():
     win = Tk()
     win.geometry("400x400")
@@ -782,15 +842,17 @@ def manager_page():
     b1 = Button(win, text=" Add Salesman", command=add_salesman, fg="red")
     b2 = Button(win, text="Update Salesman", command=update_salesman, fg="purple")
     b3 = Button(win, text="Fire Salesman", command=fire_salesman, fg="orange")
-    b4 = Button(win, text="View Customer", command=view,fg = "green")
-    b5 = Button(win, text="View All Customers", command=view_all,fg = "blue")
+    b4 = Button(win, text="View Customer", command=view, fg="green")
+    b5 = Button(win, text="View All Customers", command=view_all, fg="blue")
     b6 = Button(win, text="View sales", command=view_sales, fg='IndianRed4')
+    b7 = Button(win, text='Map Graphs', command=plots, fg='Powder Blue')
     b1.pack()
     b2.pack()
     b3.pack()
     b4.pack()
     b5.pack()
     b6.pack()
+    b7.pack()
     win.mainloop()
 
 
