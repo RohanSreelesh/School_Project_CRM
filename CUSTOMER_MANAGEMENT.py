@@ -3,8 +3,7 @@ from tkinter import messagebox
 import mysql.connector as mysql
 import pickle as p
 
-mysql_password = ''
-
+mysql_password=''
 
 def import_userdict():
     global userdict
@@ -15,64 +14,87 @@ def import_userdict():
 
 import_userdict()
 
+sql_connection = mysql.connect(user="root", password=mysql_password, host="localhost",auth_plugin='mysql_native_password')
+
+cursor_main=sql_connection.cursor()
+
+cursor_main.execute('create database if not exists project')
+
+cursor_main.execute('use project;')
+
+cursor_main.execute('create table if not exists customer (sales_id varchar(10),cust_id varchar(10),name varchar(100) ,phone_no varchar(10),email varchar(100),gender varchar(6),address varchar(500),mode varchar(10),value varchar(10));')
+
+cursor_main.execute('create table if not exists leads (name varchar(50),category varchar(50),phone_no varchar(10) ,next_meeting varchar(30));')
+
+def createuserfile():
+    userdict={'admin':'1234','avig':'1234','rohan':'1234','rishabh':'1234'}
+    f=open('users','wb')
+    userdict=p.dump(userdict,f)
+    f.flush()
+    f.close()
+with open('check.txt','a+') as f1:
+    if f1.read()=='1':
+        pass
+    else:
+        createuserfile()
+        f1.write('1')
 
 def add():
     window = Tk()
-    window.geometry("300x300")
+    window.geometry("330x300")
     window.configure(bg='pink')
     lblTitle = Label(window, text="ADD CUSTOMER", font="Arial,12", bg="Yellow")
     lblTitle.pack()
     lblsales_id = Label(window, text='Enter unique salesman id')
-
-    lblsales_id.place(x=30, y=20)
+    lblsales_id.place(x=10, y=20)
 
     entrysales_id = Entry(window)
-
     entrysales_id.place(x=160, y=20)
+    
     lblcust_id = Label(window, text="Enter Customer Id")
-    lblcust_id.place(x=30, y=50)
+    lblcust_id.place(x=10, y=50)
 
     entrycust_id = Entry(window)
     entrycust_id.place(x=160, y=50)
 
     lblname = Label(window, text="Enter Customer Name")
-    lblname.place(x=30, y=80)
+    lblname.place(x=10, y=80)
 
     entryname = Entry(window)
     entryname.place(x=160, y=80)
 
     lblph_no = Label(window, text="Enter Customer Phone")
-    lblph_no.place(x=30, y=110)
+    lblph_no.place(x=10, y=110)
 
     entryph_no = Entry(window)
     entryph_no.place(x=160, y=110)
 
     lblemail = Label(window, text="Enter Customer Email")
-    lblemail.place(x=30, y=140)
+    lblemail.place(x=10, y=140)
 
     entryemail = Entry(window)
     entryemail.place(x=160, y=140)
 
     lblgender = Label(window, text="Enter Customer Gender")
-    lblgender.place(x=30, y=170)
+    lblgender.place(x=10, y=170)
 
     entrygender = Entry(window)
     entrygender.place(x=160, y=170)
 
     lbladdress = Label(window, text="Enter Customer Address")
-    lbladdress.place(x=30, y=200)
+    lbladdress.place(x=10, y=200)
 
     entryaddress = Entry(window)
     entryaddress.place(x=160, y=200)
 
-    lblpayment_mode = Label(window, text="Enter Value")
-    lblpayment_mode.place(x=30, y=230)
+    lblpayment_mode = Label(window, text="Enter Payment mode")
+    lblpayment_mode.place(x=10, y=230)
 
     entrypayment_mode = Entry(window)
     entrypayment_mode.place(x=160, y=230)
 
     lblpayment = Label(window, text='Enter value')
-    lblpayment.place(x=30, y=260)
+    lblpayment.place(x=10, y=260)
 
     entrypayment = Entry(window)
     entrypayment.place(x=160, y=260)
@@ -89,7 +111,7 @@ def add():
         value = entrypayment.get()
 
         print(sales_id, cust_id, name, ph_no, email, gender, address, mode, value)
-        sql = "insert into customer values('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(sales_id, cust_id,
+        sql = "insert into customer values('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(sales_id, cust_id,
                                                                                                    name, ph_no,
                                                                                                    email, gender,
                                                                                                    address, mode,
@@ -365,7 +387,7 @@ def view():
         cursor.execute(sql)
         rows = cursor.fetchall()
         for row in rows:
-            print(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+            print(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
 
     Button(root2, text="Show", command=ShowIt).pack(side=BOTTOM)
     root2.mainloop()
@@ -381,7 +403,7 @@ def view_all():
     cursor.execute(sql)
     rows = cursor.fetchall()
     for row in rows:
-        print(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+        print(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
 
 
 def view_sales():
@@ -395,19 +417,19 @@ def view_sales():
 
     def ShowIt():
         sales_id = entrysales_id.get()
-        print(sales_id)
+        print(sales_id,':checking sales id')
 
-        sql = "select payment from customer where sales_id = '{}'".format(sales_id)
+        sql = "select value from customer where sales_id = '{}'".format(sales_id)
         sql_connection = mysql.connect(user="root", password=mysql_password, host="localhost", database="project",
                                        auth_plugin='mysql_native_password')
 
         cursor = sql_connection.cursor()
         cursor.execute(sql)
         rows = cursor.fetchall()
-        print(rows)
-        total = 0
-        for i in rows:
-            total += i
+        sales_list=[x[0] for x in rows]
+        sales_list=list(map(int, sales_list))
+        print(sales_list)
+        total=sum(sales_list)
         print('Gross Sales:', total)
 
     Button(root2, text="Show", command=ShowIt).pack(side=BOTTOM)
@@ -529,32 +551,31 @@ def selection_leads():
 
 def add_leads():
     window = Tk()
-    window.geometry('300x170')
+    window.geometry('300x300')
     window.configure(bg='pink')
-    lb_title = Label(window, text='Name', font="Arial,12", bg="Yellow")
+    lb_title = Label(window, text='ADD LEADS', font="Arial,10", bg="Yellow")
     lb_title.pack()
 
     lbname = Label(window, text='Name')
-
-    lbname.place(x=30, y=20)
+    lbname.place(x=10, y=20)
 
     entry_lbname = Entry(window)
-
     entry_lbname.place(x=160, y=20)
+    
     lblcategory = Label(window, text="Category")
-    lblcategory.place(x=30, y=50)
+    lblcategory.place(x=10, y=50)
 
     entry_lblcategory = Entry(window)
     entry_lblcategory.place(x=160, y=50)
 
     lblph_no = Label(window, text="Phone number")
-    lblph_no.place(x=30, y=80)
+    lblph_no.place(x=10, y=80)
 
     entry_lblph_no = Entry(window)
     entry_lblph_no.place(x=160, y=80)
 
     lbl_meet = Label(window, text="Next meeting")  # put date picker here
-    lbl_meet.place(x=30, y=110)
+    lbl_meet.place(x=10, y=110)
 
     entry_lbl_meet = Entry(window)
     entry_lbl_meet.place(x=160, y=110)
@@ -761,15 +782,15 @@ def manager_page():
     b1 = Button(win, text=" Add Salesman", command=add_salesman, fg="red")
     b2 = Button(win, text="Update Salesman", command=update_salesman, fg="purple")
     b3 = Button(win, text="Fire Salesman", command=fire_salesman, fg="orange")
-    '''b4 = Button(win, text="View Customer", command=view,fg = "green")
+    b4 = Button(win, text="View Customer", command=view,fg = "green")
     b5 = Button(win, text="View All Customers", command=view_all,fg = "blue")
-    b6 = Button(win, text="View sales", command=view_sales, fg='IndianRed4')'''
+    b6 = Button(win, text="View sales", command=view_sales, fg='IndianRed4')
     b1.pack()
     b2.pack()
     b3.pack()
-    '''b4.pack()
+    b4.pack()
     b5.pack()
-    b6.pack()'''
+    b6.pack()
     win.mainloop()
 
 
