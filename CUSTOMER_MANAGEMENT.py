@@ -1,13 +1,17 @@
 from tkinter import *
 from tkinter import messagebox
+from tkinter.ttk import Combobox as cb
 import mysql.connector as mysql
 import pickle as p
 import matplotlib.pyplot as plt
 import numpy as np
-mysql_password = '1234'
+import random
+import time
+mysql_password = ''
 hostname = 'localhost'
 
-
+cust_ids_customer_customer=[]
+cust_ids_leads=[]
 def createuserfile():
     userdict = {'admin': '1234', 'avig': '1234', 'rohan': '1234', 'rishabh': '1234'}
     f = open('users', 'wb+')
@@ -29,9 +33,10 @@ def import_userdict():
     f = open('users', 'rb+')
     userdict = p.load(f)
     f.close()
-
-
 import_userdict()
+print(userdict)
+sales_ids={'admin':'Null','avig':'002','rohan':'001','rishabh':'003'}
+
 
 sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                port=3306, auth_plugin='mysql_native_password')
@@ -42,31 +47,33 @@ cursor_main.execute('create database if not exists project')
 
 cursor_main.execute('use project;')
 
-cursor_main.execute('create table if not exists customer (sales_id varchar(10),cust_id varchar(10),name varchar(100) '
+cursor_main.execute('create table if not exists customer (sales_id varchar(10) unique,cust_id varchar(10) unique,name varchar(100) '
                     ',phone_no varchar(10),email varchar(100),gender varchar(6),address varchar(500),mode varchar('
                     '10),value varchar(10));')
 
-cursor_main.execute('create table if not exists leads (name varchar(50),category varchar(50),phone_no varchar(10) ,'
+cursor_main.execute('create table if not exists leads (cust_id varchar(30) unique,name varchar(50),category varchar(50),phone_no varchar(10) ,'
                     'next_meeting varchar(30));')
 
 
 def add():
+    global rando_id
     window = Tk()
     window.geometry("330x300")
     window.configure(bg='pink')
     lblTitle = Label(window, text="ADD CUSTOMER", font="Arial,12", bg="Yellow")
     lblTitle.pack()
-    lblsales_id = Label(window, text='Enter unique salesman id')
+    lblsales_id = Label(window, text='Unique salesman id')
     lblsales_id.place(x=10, y=20)
 
-    entrysales_id = Entry(window)
-    entrysales_id.place(x=160, y=20)
+    lblsales_id= Label(window, text=sales_id_user)
+    lblsales_id.place(x=160, y=20)
 
-    lblcust_id = Label(window, text="Enter Customer Id")
+    lblcust_id = Label(window, text="Customer Id")
     lblcust_id.place(x=10, y=50)
-
-    entrycust_id = Entry(window)
-    entrycust_id.place(x=160, y=50)
+    rando_id=str(random.randint(0,99999))
+    cust_ids_customer.append(rando_id)
+    lblcust_id= Label(window, text=rando_id)
+    lblcust_id.place(x=160, y=50)
 
     lblname = Label(window, text="Enter Customer Name")
     lblname.place(x=10, y=80)
@@ -111,8 +118,8 @@ def add():
     entrypayment.place(x=160, y=260)
 
     def Save():  # for orders
-        sales_id = entrysales_id.get()
-        cust_id = entrycust_id.get()
+        sales_id = sales_id_user
+        cust_id = rando_id
         name = entryname.get()
         ph_no = entryph_no.get()
         email = entryemail.get()
@@ -344,9 +351,7 @@ def update():
         b3.pack()
         b4.pack()
         b5.pack()
-
-    win1 = update__()
-    win1.mainloop()
+        win1.mainloop()
 
 
 def delete():
@@ -421,17 +426,16 @@ def view_all():
 def view_sales():
     root2 = Tk()
 
-    lblsales_id = Label(root2, text="Enter Your Sales ID")
+    lblsales_id = Label(root2, text="Your Sales ID")
     lblsales_id.pack()
 
-    entrysales_id = Entry(root2)
+    entrysales_id = Label(root2, text=sales_id_user)
     entrysales_id.pack()
 
     def ShowIt():
-        sales_id = entrysales_id.get()
-        print(sales_id, ':checking sales id')
+        print(sales_id_user, ':checking sales id')
 
-        sql = "select value from customer where sales_id = '{}'".format(sales_id)
+        sql = "select value from customer where sales_id = '{}'".format(sales_id_user)
         sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                        database='project', port=3306, auth_plugin='mysql_native_password')
 
@@ -470,7 +474,7 @@ def customer_all():
 
 
 def login():
-    global loginwindow, usernameentry, passwordentry
+    global loginwindow, usernameentry, passwordentry, sales_id_user
     # this label notifies progress find a way so that it does not stack
     Label(loginwindow, text="loading", font="Arial,12", bg="Yellow").pack()
 
@@ -500,7 +504,7 @@ def login():
         if userdict[user] == password:
 
             messagebox.showinfo("SUCCESS", "WELCOME BACK " + user)
-
+            sales_id_user=sales_ids[user]
             loginwindow.destroy()
 
             # customer_all()
@@ -514,7 +518,26 @@ def login():
 
     loginwindow.mainloop()
 
-
+def welcome_page():
+    text1='''Welcome to customer relations management 
+          
+    please enter your designated username and password
+    
+    if you don\' t have the details then please contact the administration
+    
+    for a salesman: enter potential customer details as leads
+    
+    add new customers as orders
+    
+    for a manager: add,update and fire salesmen also analyse data '''
+    welcome = Tk()
+    #welcome.configure()
+    #welcome.geometry()
+    lbl =Label(welcome,text=text1)
+    lbl.pack()
+    okbutton=Button(welcome,text='ok',command=login_front)
+    okbutton.pack()
+    welcome.mainloop()
 # login page starts here label and entry ko side by side kar de
 def login_front():
     global loginwindow, usernameentry, passwordentry
@@ -563,53 +586,64 @@ def selection_leads():
 
 def add_leads():
     window = Tk()
-    window.geometry('300x300')
+    window.geometry('300x330')
     window.configure(bg='pink')
     lb_title = Label(window, text='ADD LEADS', font="Arial,10", bg="Yellow")
     lb_title.pack()
-
+    cust_id_lead=str(random.randint(0,99999))
+    cust_ids_leads.append(cust_id_lead)
+    lblcustidname= Label(window, text='Customer ID')
+    lblcustidname.place(x=10,y=20)
+    lblcustid =Label(window, text=cust_id_lead)
+    lblcustid.place(x=160,y=20)
+    
     lbname = Label(window, text='Name')
-    lbname.place(x=10, y=20)
+    lbname.place(x=10, y=50)
 
     entry_lbname = Entry(window)
-    entry_lbname.place(x=160, y=20)
+    entry_lbname.place(x=160, y=50)
 
     lblcategory = Label(window, text="Category")
-    lblcategory.place(x=10, y=50)
+    lblcategory.place(x=10, y=80)
 
     entry_lblcategory = Entry(window)
-    entry_lblcategory.place(x=160, y=50)
+    entry_lblcategory.place(x=160, y=80)
 
     lblph_no = Label(window, text="Phone number")
-    lblph_no.place(x=10, y=80)
+    lblph_no.place(x=10, y=110)
 
     entry_lblph_no = Entry(window)
-    entry_lblph_no.place(x=160, y=80)
+    entry_lblph_no.place(x=160, y=110)
 
-    lbl_meet = Label(window, text="Next meeting")  # put date picker here
-    lbl_meet.place(x=10, y=110)
+    lbl_meet = Label(window, text="Next meeting ('ddmmyy')")  # put date picker here
+    lbl_meet.place(x=10, y=130)
 
     entry_lbl_meet = Entry(window)
-    entry_lbl_meet.place(x=160, y=110)
-
+    entry_lbl_meet.place(x=160, y=130)
+    print (time.strftime("%d%m%Y"))
     def Save():  # for orders
+        cust_id=cust_id_lead
         name = entry_lbname.get()
         category = entry_lblcategory.get()
         phone = entry_lblph_no.get()
         meet = entry_lbl_meet.get()
+        if meet>time.strftime("%d%m%Y"):
+                    print(name, category, phone, meet)
+                    sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id,name, category, phone, meet)
 
-        print(name, category, phone, meet)
-        sql = "insert into leads values('{}', '{}', '{}', '{}')".format(name, category, phone, meet)
+                    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                                   database='project', port=3306, auth_plugin='mysql_native_password')
 
-        sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
-                                       database='project', port=3306, auth_plugin='mysql_native_password')
+                    cursor = sql_connection.cursor()
+                    cursor.execute(sql)
 
-        cursor = sql_connection.cursor()
-        cursor.execute(sql)
+                    sql_connection.commit()
 
-        sql_connection.commit()
+                    print(name, " Saved in DataBase")
+        else:
+            print('Please enter a future date')
 
-        print(name, " Saved in DataBase")
+
 
     Button(window, text="Save", command=Save).pack(side=BOTTOM)
     window.mainloop()
@@ -646,18 +680,18 @@ def delete_leads():
 
 def view_leads():
     root2 = Tk()
+    combo=cb(root2,  values=cust_ids_customer, width=15,height=20)
+    combo.set('Select customer ID')
+    combo.pack()
 
-    lblname = Label(root2, text="Enter Customer Name")
-    lblname.pack()
-
-    entryname = Entry(root2)
+    entryname = combo.get()
     entryname.pack()
 
     def ShowIt():
-        name = entryname.get()
+        name = combo.get()
         print(name)
 
-        sql = "select * from leads where name = '{}'".format(name)
+        sql = "select * from leads where cust_id = '{}'".format(name)
         sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                        database='project', port=3306, auth_plugin='mysql_native_password')
 
@@ -665,7 +699,7 @@ def view_leads():
         cursor.execute(sql)
         rows = cursor.fetchall()
         for row in rows:
-            print(row[0], row[1], row[2], row[3])
+            print(row[0], row[1], row[2], row[3], row[4])
 
     Button(root2, text="Show", command=ShowIt).pack(side=BOTTOM)
     root2.mainloop()
@@ -681,7 +715,7 @@ def view_all_leads():
     cursor.execute(sql)
     rows = cursor.fetchall()
     for row in rows:
-        print(row[0], row[1], row[2], row[3])
+        print(row[0], row[1], row[2], row[3], row[4])
 
 
 def add_salesman():
@@ -826,12 +860,14 @@ def plots():
         if i not in total_sales_list_final:
             total_sales_list_final.append(i)
     print(total_sales_list_final)
-
+    plt.figure()
     plt.bar(np.arange(len(id_list_final)),total_sales_list_final, align='center', alpha=0.5)
     plt.xticks(np.arange(len(id_list_final)),id_list_final)
     plt.ylabel('Total Sale in Rupees')
     plt.xlabel('Sales ID of salesman')
     plt.title('Total sales of each Salesman')
+    
+    
     plt.show()
 def manager_page():
     win = Tk()
@@ -871,4 +907,4 @@ def selection():
     win.mainloop()
 
 
-login_front()
+welcome_page()
