@@ -7,11 +7,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 import time
-mysql_password = ''
+
+mysql_password = '1234'
 hostname = 'localhost'
 
-cust_ids_customer_customer=[]
-cust_ids_leads=[]
+cust_ids_customer = []
+cust_ids_leads = []
+total_sales_list_final = []
+id_list_final = []
+
 def createuserfile():
     userdict = {'admin': '1234', 'avig': '1234', 'rohan': '1234', 'rishabh': '1234'}
     f = open('users', 'wb+')
@@ -33,10 +37,11 @@ def import_userdict():
     f = open('users', 'rb+')
     userdict = p.load(f)
     f.close()
+
+
 import_userdict()
 print(userdict)
-sales_ids={'admin':'Null','avig':'002','rohan':'001','rishabh':'003'}
-
+sales_ids = {'admin': 'Null', 'avig': '2', 'rohan': '1', 'rishabh': '3'}
 
 sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                port=3306, auth_plugin='mysql_native_password')
@@ -47,12 +52,19 @@ cursor_main.execute('create database if not exists project')
 
 cursor_main.execute('use project;')
 
-cursor_main.execute('create table if not exists customer (sales_id varchar(10) unique,cust_id varchar(10) unique,name varchar(100) '
-                    ',phone_no varchar(10),email varchar(100),gender varchar(6),address varchar(500),mode varchar('
-                    '10),value varchar(10));')
+cursor_main.execute(
+    'create table if not exists customer (sales_id varchar(10) unique,cust_id varchar(10) unique,name varchar(100) '
+    ',phone_no varchar(10),email varchar(100),gender varchar(6),address varchar(500),mode varchar('
+    '10),value varchar(10));')
 
-cursor_main.execute('create table if not exists leads (cust_id varchar(30) unique,name varchar(50),category varchar(50),phone_no varchar(10) ,'
-                    'next_meeting varchar(30));')
+cursor_main.execute(
+    'create table if not exists leads (cust_id varchar(30) unique,name varchar(50),cust_type varchar(50),'
+    'phone_no varchar(10) , '
+    'next_meeting varchar(30));')
+
+
+def delete_Check():
+    messagebox.askyesno('DELETE', 'DO YOU REALLY WANT TO DELETE')
 
 
 def add():
@@ -60,19 +72,23 @@ def add():
     window = Tk()
     window.geometry("330x300")
     window.configure(bg='pink')
+
     lblTitle = Label(window, text="ADD CUSTOMER", font="Arial,12", bg="Yellow")
     lblTitle.pack()
+
     lblsales_id = Label(window, text='Unique salesman id')
     lblsales_id.place(x=10, y=20)
 
-    lblsales_id= Label(window, text=sales_id_user)
+    lblsales_id = Label(window, text=sales_id_user)
     lblsales_id.place(x=160, y=20)
 
     lblcust_id = Label(window, text="Customer Id")
     lblcust_id.place(x=10, y=50)
-    rando_id=str(random.randint(0,99999))
+
+    rando_id = str(random.randint(0, 99999))
     cust_ids_customer.append(rando_id)
-    lblcust_id= Label(window, text=rando_id)
+
+    lblcust_id = Label(window, text=rando_id)
     lblcust_id.place(x=160, y=50)
 
     lblname = Label(window, text="Enter Customer Name")
@@ -93,11 +109,12 @@ def add():
     entryemail = Entry(window)
     entryemail.place(x=160, y=140)
 
-    lblgender = Label(window, text="Enter Customer Gender")
+    lblgender = Label(window, text="Select Customer Gender")
     lblgender.place(x=10, y=170)
 
-    entrygender = Entry(window)
-    entrygender.place(x=160, y=170)
+    combogender = cb(window, value=['Male', 'Female', 'Others'], width=10, height=10)
+    combogender.set('Genders')
+    combogender.place(x=160, y=170)
 
     lbladdress = Label(window, text="Enter Customer Address")
     lbladdress.place(x=10, y=200)
@@ -105,10 +122,10 @@ def add():
     entryaddress = Entry(window)
     entryaddress.place(x=160, y=200)
 
-    lblpayment_mode = Label(window, text="Enter Payment mode")
+    lblpayment_mode = Label(window, text="Select Payment mode")
     lblpayment_mode.place(x=10, y=230)
 
-    entrypayment_mode = Entry(window)
+    entrypayment_mode = cb(window, value=['Cash', 'Card', 'Others'], width=10, height=10)
     entrypayment_mode.place(x=160, y=230)
 
     lblpayment = Label(window, text='Enter value')
@@ -123,34 +140,43 @@ def add():
         name = entryname.get()
         ph_no = entryph_no.get()
         email = entryemail.get()
-        gender = entrygender.get()
+        gender = combogender.get()
         address = entryaddress.get()
         mode = entrypayment_mode.get()
         value = entrypayment.get()
+        if value > 0:
+            print(sales_id, cust_id, name, ph_no, email, gender, address, mode, value)
+            sql = "insert into customer values('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(sales_id,
+                                                                                                             cust_id,
+                                                                                                             name,
+                                                                                                             ph_no,
+                                                                                                             email,
+                                                                                                             gender,
+                                                                                                             address,
+                                                                                                             mode,
+                                                                                                             value)
 
-        print(sales_id, cust_id, name, ph_no, email, gender, address, mode, value)
-        sql = "insert into customer values('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(sales_id,
-                                                                                                         cust_id,
-                                                                                                         name, ph_no,
-                                                                                                         email, gender,
-                                                                                                         address, mode,
-                                                                                                         value)
+            sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                           database='project', port=3306, auth_plugin='mysql_native_password')
 
-        sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
-                                       database='project', port=3306, auth_plugin='mysql_native_password')
+            cursor = sql_connection.cursor()
+            cursor.execute(sql)
 
-        cursor = sql_connection.cursor()
-        cursor.execute(sql)
+            sql_connection.commit()
 
-        sql_connection.commit()
-
-        print(name, " Saved in DataBase")
+            print(name, " Saved in DataBase")
+        else:
+            print("Sales cannot be negative. We don't give out loans")
 
     Button(window, text="Save", command=Save).pack(side=BOTTOM)
     window.mainloop()
 
 
 def update():
+    win1 = Tk()
+    win1.geometry(400 * 400)
+    win1.configure(bg='bisque')
+
     def update_name():
         window1 = Tk()
         window1.geometry("200x200")
@@ -163,17 +189,17 @@ def update():
         entryname = Entry(window1)
         entryname.pack()
 
-        lblemail = Label(window1, text="Enter Customer Email")
-        lblemail.pack()
-        entryemail = Entry(window1)
-        entryemail.pack()
+        lblid = Label(window1, text="Enter Customer ID")
+        lblid.pack()
+        entryid = Entry(window1)
+        entryid.pack()
 
         def update1():
             name = entryname.get()
-            email = entryemail.get()
+            email = entryid.get()
 
             print(name, email)
-            sql = "update customer set name='{}' where email='{}'".format(name, email)
+            sql = "update customer set name='{}' where cust_id='{}'".format(name, email)
 
             sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                            database='project', port=3306, auth_plugin='mysql_native_password')
@@ -183,7 +209,7 @@ def update():
 
             sql_connection.commit()
 
-            print(name, " Update in DataBase")
+            print(name, " Updated in DataBase")
 
         Button(window1, text="Update Name", command=update1).pack(side=BOTTOM)
         window1.mainloop()
@@ -200,17 +226,17 @@ def update():
         entryph_no = Entry(window2)
         entryph_no.pack()
 
-        lblname = Label(window2, text="Enter Customer Name")
-        lblname.pack()
-        entryname = Entry(window2)
-        entryname.pack()
+        lblid = Label(window2, text="Enter Customer ID")
+        lblid.pack()
+        entryid = Entry(window2)
+        entryid.pack()
 
         def update2():
             ph_no = entryph_no.get()
-            name = entryname.get()
+            name = entryid.get()
 
             print(ph_no, name)
-            sql = "update customer set ph_no='{}' where name='{}'".format(ph_no, name)
+            sql = "update customer set ph_no='{}' where cust_id='{}'".format(ph_no, name)
 
             sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                            database='project', port=3306, auth_plugin='mysql_native_password')
@@ -220,7 +246,7 @@ def update():
 
             sql_connection.commit()
 
-            print(ph_no, " Update in DataBase")
+            print(ph_no, " Updated in DataBase")
 
         Button(window2, text="Update Phone", command=update2).pack(side=BOTTOM)
         window2.mainloop()
@@ -237,17 +263,17 @@ def update():
         entryemail = Entry(window3)
         entryemail.pack()
 
-        lblname = Label(window3, text="Enter Customer Name")
-        lblname.pack()
-        entryname = Entry(window3)
-        entryname.pack()
+        id = Label(window3, text="Enter Customer ID")
+        id.pack()
+        entryid = Entry(window3)
+        entryid.pack()
 
         def update3():
             email = entryemail.get()
-            name = entryname.get()
+            name = entryid.get()
 
             print(email, name)
-            sql = "update customer set email='{}' where name='{}'".format(email, name)
+            sql = "update customer set email='{}' where cust_id='{}'".format(email, name)
 
             sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                            database='project', port=3306, auth_plugin='mysql_native_password')
@@ -257,7 +283,7 @@ def update():
 
             sql_connection.commit()
 
-            print(email, " Update in DataBase")
+            print(email, " Updated in DataBase")
 
         Button(window3, text="Update Email", command=update3).pack(side=BOTTOM)
         window3.mainloop()
@@ -274,17 +300,17 @@ def update():
         entryaddress = Entry(window4)
         entryaddress.pack()
 
-        lblname = Label(window4, text="Enter Customer Name")
-        lblname.pack()
-        entryname = Entry(window4)
-        entryname.pack()
+        lblid = Label(window4, text="Enter Customer ID")
+        lblid.pack()
+        entryid = Entry(window4)
+        entryid.pack()
 
         def update4():
             address = entryaddress.get()
-            name = entryname.get()
+            name = entryid.get()
 
             print(address, name)
-            sql = "update customer set address='{}' where name='{}'".format(address, name)
+            sql = "update customer set address='{}' where cust_id='{}'".format(address, name)
 
             sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                            database='project', port=3306, auth_plugin='mysql_native_password')
@@ -294,73 +320,27 @@ def update():
 
             sql_connection.commit()
 
-            print(address, " Update in DataBase")
+            print(address, " Updated in DataBase")
 
         Button(window4, text="Update Address", command=update4).pack(side=BOTTOM)
         window4.mainloop()
 
-    def update_paymentmode():
-        window5 = Tk()
-        window5.geometry("200x200")
-        window5.configure(bg='powderblue')
-        lblTitle = Label(window5, text="Update Payment Mode", font="Arial,12", bg="Yellow")
-        lblTitle.pack()
+    b1 = Button(win1, text="Update Customer Name", command=update_name)
+    b2 = Button(win1, text="Update Customer Phone", command=update_phone)
+    b3 = Button(win1, text="Update Customer Email", command=update_email)
+    b4 = Button(win1, text="Update Customer Address", command=update_address)
 
-        lblpayment_mode = Label(window5, text="Enter Updated Payment Mode")
-        lblpayment_mode.pack()
-        entrypayment_mode = Entry(window5)
-        entrypayment_mode.pack()
-
-        lblname = Label(window5, text="Enter Customer Name")
-        lblname.pack()
-        entryname = Entry(window5)
-        entryname.pack()
-
-        def update5():
-            payment_mode = entrypayment_mode.get()
-            name = entryname.get()
-
-            print(payment_mode, name)
-            sql = "update customer set payment_mode='{}' where name='{}'".format(payment_mode, name)
-
-            sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
-                                           database='project', port=3306, auth_plugin='mysql_native_password')
-
-            cursor = sql_connection.cursor()
-            cursor.execute(sql)
-
-            sql_connection.commit()
-
-            print(payment_mode, " Update in DataBase")
-
-        Button(window5, text="Update Payment Mode", command=update5).pack(side=BOTTOM)
-        window5.mainloop()
-
-    def update__():
-        win1 = Tk()
-        frame1 = Frame(win1)
-        frame1.pack()
-        b1 = Button(frame1, text="Update Customer Name", command=update_name)
-        b2 = Button(frame1, text="Update Customer Phone", command=update_phone)
-        b3 = Button(frame1, text="Update Customer Email", command=update_email)
-        b4 = Button(frame1, text="Update Customer Address", command=update_address)
-        b5 = Button(frame1, text="Update Payment Mode", command=update_paymentmode)
-
-        b1.pack()
-        b2.pack()
-        b3.pack()
-        b4.pack()
-        b5.pack()
-        win1.mainloop()
+    b1.pack()
+    b2.pack()
+    b3.pack()
+    b4.pack()
+    win1.mainloop()
 
 
 def delete():
     root = Tk()
 
-    lblTitle = Label(root, text="Enter Name", font="Arial,16", bg="Yellow")
-    lblTitle.pack()
-
-    lblname = Label(root, text="Enter Customer Name")
+    lblname = Label(root, text="Enter Customer  ID")
     lblname.pack()
 
     entryname = Entry(root)
@@ -370,14 +350,17 @@ def delete():
         name = entryname.get()
         print(name)
 
-        sql = "delete from customer where name = '{}'".format(name)
+        sql = "delete from customer where cust_id = '{}'".format(name)
         sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                        database='project', port=3306, auth_plugin='mysql_native_password')
 
         cursor = sql_connection.cursor()
-        cursor.execute(sql)
-        sql_connection.commit()
-        print(name, " Delete from DataBase")
+        if delete_Check() == True:
+            cursor.execute(sql)
+            sql_connection.commit()
+            print(name, " Deleted from DataBase")
+        else:
+            print(name, 'Record not deleted')
 
     Button(root, text="Delete", command=DeleteIt).pack(side=BOTTOM)
     root.mainloop()
@@ -386,10 +369,11 @@ def delete():
 def view():
     root2 = Tk()
 
-    lblname = Label(root2, text="Enter Customer Name")
+    lblname = Label(root2, text="Select Customer ID")
     lblname.pack()
 
-    entryname = Entry(root2)
+    entryname = cb(root2, value=cust_ids_customer, width=10, height=10)
+    entryname.set('Choose Id')
     entryname.pack()
 
     def ShowIt():
@@ -504,7 +488,7 @@ def login():
         if userdict[user] == password:
 
             messagebox.showinfo("SUCCESS", "WELCOME BACK " + user)
-            sales_id_user=sales_ids[user]
+            sales_id_user = sales_ids[user]
             loginwindow.destroy()
 
             # customer_all()
@@ -518,26 +502,29 @@ def login():
 
     loginwindow.mainloop()
 
+
 def welcome_page():
-    text1='''Welcome to customer relations management 
-          
+    text1 = '''Welcome to customer relations management 
+
     please enter your designated username and password
-    
+
     if you don\' t have the details then please contact the administration
-    
+
     for a salesman: enter potential customer details as leads
-    
+
     add new customers as orders
-    
+
     for a manager: add,update and fire salesmen also analyse data '''
     welcome = Tk()
-    #welcome.configure()
-    #welcome.geometry()
-    lbl =Label(welcome,text=text1)
+    # welcome.configure()
+    # welcome.geometry()
+    lbl = Label(welcome, text=text1)
     lbl.pack()
-    okbutton=Button(welcome,text='ok',command=login_front)
+    okbutton = Button(welcome, text='ok', command=login_front)
     okbutton.pack()
     welcome.mainloop()
+
+
 # login page starts here label and entry ko side by side kar de
 def login_front():
     global loginwindow, usernameentry, passwordentry
@@ -590,24 +577,28 @@ def add_leads():
     window.configure(bg='pink')
     lb_title = Label(window, text='ADD LEADS', font="Arial,10", bg="Yellow")
     lb_title.pack()
-    cust_id_lead=str(random.randint(0,99999))
+
+    cust_id_lead = str(random.randint(0, 99999))
     cust_ids_leads.append(cust_id_lead)
-    lblcustidname= Label(window, text='Customer ID')
-    lblcustidname.place(x=10,y=20)
-    lblcustid =Label(window, text=cust_id_lead)
-    lblcustid.place(x=160,y=20)
-    
+
+    lblcustidname = Label(window, text='Customer ID')
+    lblcustidname.place(x=10, y=20)
+
+    lblcustid = Label(window, text=cust_id_lead)
+    lblcustid.place(x=160, y=20)
+
     lbname = Label(window, text='Name')
     lbname.place(x=10, y=50)
 
     entry_lbname = Entry(window)
     entry_lbname.place(x=160, y=50)
 
-    lblcategory = Label(window, text="Category")
+    lblcategory = Label(window, text="Customer Type")
     lblcategory.place(x=10, y=80)
 
-    entry_lblcategory = Entry(window)
-    entry_lblcategory.place(x=160, y=80)
+    combo_custtype = cb(window, values=['New', 'Repeating'], width=10, height=10)
+    combo_custtype.set('Select')
+    combo_custtype.place(x=160, y=80)
 
     lblph_no = Label(window, text="Phone number")
     lblph_no.place(x=10, y=110)
@@ -620,30 +611,29 @@ def add_leads():
 
     entry_lbl_meet = Entry(window)
     entry_lbl_meet.place(x=160, y=130)
-    print (time.strftime("%d%m%Y"))
+    print(time.strftime("%d%m%Y"))
+
     def Save():  # for orders
-        cust_id=cust_id_lead
+        cust_id = cust_id_lead
         name = entry_lbname.get()
-        category = entry_lblcategory.get()
+        category = combo_custtype.get()
         phone = entry_lblph_no.get()
         meet = entry_lbl_meet.get()
-        if meet>time.strftime("%d%m%Y"):
-                    print(name, category, phone, meet)
-                    sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id,name, category, phone, meet)
+        if meet > time.strftime("%d%m%Y"):
+            print(name, category, phone, meet)
+            sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
 
-                    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
-                                                   database='project', port=3306, auth_plugin='mysql_native_password')
+            sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                           database='project', port=3306, auth_plugin='mysql_native_password')
 
-                    cursor = sql_connection.cursor()
-                    cursor.execute(sql)
+            cursor = sql_connection.cursor()
+            cursor.execute(sql)
 
-                    sql_connection.commit()
+            sql_connection.commit()
 
-                    print(name, " Saved in DataBase")
+            print(name, " Saved in DataBase")
         else:
             print('Please enter a future date')
-
-
 
     Button(window, text="Save", command=Save).pack(side=BOTTOM)
     window.mainloop()
@@ -652,11 +642,8 @@ def add_leads():
 def delete_leads():
     root = Tk()
 
-    lblTitle = Label(root, text="Enter Name", font="Arial,16", bg="Yellow")
+    lblTitle = Label(root, text="Enter Cust_ID", font="Arial,16", bg="Yellow")
     lblTitle.pack()
-
-    lblname = Label(root, text="Enter Lead Name")
-    lblname.pack()
 
     entryname = Entry(root)
     entryname.pack()
@@ -665,14 +652,15 @@ def delete_leads():
         name = entryname.get()
         print(name)
 
-        sql = "delete from leads where name = '{}'".format(name)
+        sql = "delete from leads where cust_id = '{}'".format(name)
         sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                        database='project', port=3306, auth_plugin='mysql_native_password')
-
         cursor = sql_connection.cursor()
-        cursor.execute(sql)
-        sql_connection.commit()
-        print(name, " Delete from DataBase")
+        if delete_Check() == True:
+            cursor.execute(sql)
+            print(name, 'Deleted from database')
+        else:
+            print(name, 'Record not deleted')
 
     Button(root, text="Delete", command=DeleteIt_leads).pack(side=BOTTOM)
     root.mainloop()
@@ -680,7 +668,7 @@ def delete_leads():
 
 def view_leads():
     root2 = Tk()
-    combo=cb(root2,  values=cust_ids_customer, width=15,height=20)
+    combo = cb(root2, values=cust_ids_customer, width=15, height=20)
     combo.set('Select customer ID')
     combo.pack()
 
@@ -833,42 +821,74 @@ def fire_salesman():
 
     Button(update3, text='Fire!!!', command=process, bg='black', fg='red').pack()
 
+
 def plots():
-    total_sales_list=[]
-    total_sales_list_final=[]
-    id_list_final=[]
-    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
-                                   database='project', port=3306, auth_plugin='mysql_native_password')
-    cursor = sql_connection.cursor()
+    plotswin = Tk()
+    plotswin.geometry('300x300')
+    plotswin.configure(bg='burlywood1')
 
-    cursor.execute('select sales_id from customer')
-    id_list= [x[0] for x in cursor.fetchall()]
-    for i in id_list:
-        if i not in id_list_final:
-            id_list_final.append(i)
-    id_list_final=list(map(int, id_list_final))
-    print(id_list_final)
+    def total_sales_vs_salesman():
+        global id_list_final, total_sales_list_final
+        total_sales_list = []
 
-    for i in id_list:
-        cursor.execute("select value from customer where sales_id='{}'".format(i))
-        rows = cursor.fetchall()
-        sales_list = [x[0] for x in rows]
-        sales_list = list(map(int, sales_list))
-        total = sum(sales_list)
-        total_sales_list.append(total)
-    for i in total_sales_list:
-        if i not in total_sales_list_final:
-            total_sales_list_final.append(i)
-    print(total_sales_list_final)
-    plt.figure()
-    plt.bar(np.arange(len(id_list_final)),total_sales_list_final, align='center', alpha=0.5)
-    plt.xticks(np.arange(len(id_list_final)),id_list_final)
-    plt.ylabel('Total Sale in Rupees')
-    plt.xlabel('Sales ID of salesman')
-    plt.title('Total sales of each Salesman')
-    
-    
-    plt.show()
+        sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                       database='project', port=3306, auth_plugin='mysql_native_password')
+        cursor = sql_connection.cursor()
+
+        cursor.execute('select sales_id from customer')
+        id_list = [x[0] for x in cursor.fetchall()]
+        for i in id_list:
+            if i not in id_list_final:
+                id_list_final.append(i)
+        id_list_final = list(map(int, id_list_final))
+        print(id_list_final)
+
+        for i in id_list:
+            cursor.execute("select value from customer where sales_id='{}'".format(i))
+            rows = cursor.fetchall()
+            sales_list = [x[0] for x in rows]
+            sales_list = list(map(int, sales_list))
+            total = sum(sales_list)
+            total_sales_list.append(total)
+        for i in total_sales_list:
+            if i not in total_sales_list_final:
+                total_sales_list_final.append(i)
+        print(total_sales_list_final)
+        plt.figure()
+        plt.bar(np.arange(len(id_list_final)), total_sales_list_final, align='center', alpha=0.5)
+        plt.xticks(np.arange(len(id_list_final)), id_list_final)
+        plt.ylabel('Total Sale in Rupees')
+        plt.xlabel('Sales ID of salesman')
+        plt.title('Total sales of each Salesman')
+
+        plt.show()
+
+    def pie_totalsales_vs_salesman():
+        labels = id_list_final
+        sizes = total_sales_list_final
+        colors = ['AntiqueWhite3', 'CadetBlue2', 'DarkOliveGreen2', 'DarkSeaGreen4', 'IndianRed2', 'LightSteelBlue4',
+                  'LightYellow2', 'LightYellow3', 'LightYellow4', 'MediumOrchid1', 'MediumOrchid2', 'MediumOrchid3',
+                  'MediumOrchid4', 'MediumPurple1', 'MediumPurple2', 'MediumPurple3', 'MediumPurple4', 'MistyRose2',
+                  'MistyRose3', 'MistyRose4', 'NavajoWhite2', 'NavajoWhite3', 'NavajoWhite4', 'OliveDrab1',
+                  'OliveDrab2', 'OliveDrab4', 'OrangeRed2', 'OrangeRed3', 'OrangeRed4', 'PaleGreen1', 'PaleGreen2',
+                  'PaleGreen3', 'PaleGreen4', 'PaleTurquoise1', 'PaleTurquoise2', 'PaleTurquoise3', 'PaleTurquoise4',
+                  'PaleVioletRed1', 'PaleVioletRed2', 'PaleVioletRed3']
+        explode = []
+        for i in total_sales_list_final:
+            if i > 10000:
+                explode.append(0.2)
+            else:
+                explode.append(0)
+        print(explode)
+        plt.pie(sizes, explode=explode, labels=labels, colors=colors,
+                autopct='%03.1f%%', shadow=True, startangle=140)
+        plt.axis('equal')
+        plt.show()
+
+    Button(plotswin, text='View Salesman vs Total Sales Graph', command=total_sales_vs_salesman).pack()
+    Button(plotswin, text='View Salesman vs Total Sales Graph in Pie', command=pie_totalsales_vs_salesman).pack()
+
+
 def manager_page():
     win = Tk()
     win.geometry("400x400")
