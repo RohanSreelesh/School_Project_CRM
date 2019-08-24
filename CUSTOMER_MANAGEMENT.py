@@ -72,6 +72,11 @@ rows=cursor_main.fetchall()
 for i in rows:
     cust_ids_customer.append(i[0])
 
+cursor_main.execute('select cust_id from leads;')
+rows=cursor_main.fetchall()
+for i in rows:
+    cust_ids_leads.append(i[0])
+
 def delete_Check():
     messagebox.askyesno('DELETE', 'DO YOU REALLY WANT TO DELETE')
 
@@ -568,6 +573,7 @@ def selection_leads():
 
 
 def add_leads():
+    global cust_ids_leads
     window = Toplevel()
     window.geometry('300x330')
     window.configure(bg='pink')
@@ -618,7 +624,7 @@ def add_leads():
         meet = entry_lbl_meet.get()
         print(type(meet))
         print(type(date_today))
-        if int(meet[2:4]) > int(date_today[2:4]):
+        if int(meet[2:4]) > int(date_today[2:4]) and int(meet[4:])==int(date_today[4:]) :
             print(cust_id, name, category, phone, meet)
             sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
 
@@ -632,7 +638,7 @@ def add_leads():
 
             print(name, " Saved in DataBase")
         elif int(meet[4:])>int(date_today[4:]):
-            print(name, category, phone, meet)
+            print(cust_id, name, category, phone, meet)
             sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
 
             sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
@@ -644,8 +650,8 @@ def add_leads():
             sql_connection.commit()
 
             print(name, " Saved in DataBase")
-        elif int(meet[2:4]) == int(date_today[2:4]) and int(meet[0:3])>int(date_today[0:3]):
-            print(name, category, phone, meet)
+        elif (int(meet[2:4]) == int(date_today[2:4] and int(meet[4:])==int(date_today[4:]))) and int(meet[0:3])>int(date_today[0:3]) :
+            print(cust_id, name, category, phone, meet)
             sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
 
             sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
@@ -691,7 +697,7 @@ def delete_leads():
 
 def view_leads():
     root2 = Toplevel()
-    combo = cb(root2, values=cust_ids_customer, width=15, height=20)
+    combo = cb(root2, values=cust_ids_leads, width=15, height=20)
     combo.set('Select customer ID')
     combo.pack()
 
