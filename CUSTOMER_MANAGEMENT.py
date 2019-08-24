@@ -8,7 +8,7 @@ import numpy as np
 import random
 import time
 
-mysql_password = '1234'
+mysql_password = 'Rohan2002'
 hostname = 'localhost'
 salesidcount=3
 f3 = open('count_check','w+')
@@ -31,13 +31,7 @@ def createsalesidfile():
     p.dump(sales_ids, f)
     f.flush()
     f.close()
-with open('check.txt', 'w+') as f1:
-    if f1.read() == '1':
-        pass
-    else:
-        createsalesidfile()
-        createuserfile()
-        f1.write('1')
+
 
 
 def import_userdict():
@@ -50,10 +44,8 @@ def import_salesids():
     f = open('salesids','rb+')
     sales_ids_dict = p.load(f)
     f.close()
-import_salesids()
-import_userdict()
-print(userdict)
-print(sales_ids_dict)
+
+
 
 
 sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
@@ -963,5 +955,16 @@ def selection():
     b1.pack()
     b2.pack()
 
+with open('check.txt', 'w+') as f1:
+    if f1.read() == '1':
+        pass
+    else:
+        createsalesidfile()
+        createuserfile()
+        f1.write('1')
 
+import_salesids()
+import_userdict()
+print(userdict)
+print(sales_ids_dict)
 welcome_page()
