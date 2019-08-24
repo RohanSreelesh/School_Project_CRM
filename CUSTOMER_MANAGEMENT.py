@@ -10,7 +10,10 @@ import time
 
 mysql_password = '1234'
 hostname = 'localhost'
-
+salesidcount=3
+f3 = open('count_check','w+')
+f3.write(str(salesidcount))
+f3.close()
 cust_ids_customer = []
 cust_ids_leads = []
 total_sales_list_final = []
@@ -22,12 +25,17 @@ def createuserfile():
     p.dump(userdict, f)
     f.flush()
     f.close()
-
-
+def createsalesidfile():
+    sales_ids = {'admin': 'Null', 'avig': '2', 'rohan': '1', 'rishabh': '3'}
+    f = open('salesids', 'wb+')
+    p.dump(sales_ids, f)
+    f.flush()
+    f.close()
 with open('check.txt', 'w+') as f1:
     if f1.read() == '1':
         pass
     else:
+        createsalesidfile()
         createuserfile()
         f1.write('1')
 
@@ -37,11 +45,16 @@ def import_userdict():
     f = open('users', 'rb+')
     userdict = p.load(f)
     f.close()
-
-
+def import_salesids():
+    global sales_ids_dict
+    f = open('salesids','rb+')
+    sales_ids_dict = p.load(f)
+    f.close()
+import_salesids()
 import_userdict()
 print(userdict)
-sales_ids = {'admin': 'Null', 'avig': '2', 'rohan': '1', 'rishabh': '3'}
+print(sales_ids_dict)
+
 
 sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                port=3306, auth_plugin='mysql_native_password')
@@ -69,7 +82,7 @@ def delete_Check():
 
 def add():
     global rando_id
-    window = Tk()
+    window = Toplevel()
     window.geometry("330x300")
     window.configure(bg='pink')
 
@@ -173,12 +186,12 @@ def add():
 
 
 def update():
-    win1 = Tk()
+    win1 = Toplevel()
     win1.geometry(400 * 400)
     win1.configure(bg='bisque')
 
     def update_name():
-        window1 = Tk()
+        window1 = Toplevel()
         window1.geometry("200x200")
         window1.configure(bg='powderblue')
         lblTitle = Label(window1, text="Update Name", font="Arial,12", bg="Yellow")
@@ -212,10 +225,9 @@ def update():
             print(name, " Updated in DataBase")
 
         Button(window1, text="Update Name", command=update1).pack(side=BOTTOM)
-        window1.mainloop()
 
     def update_phone():
-        window2 = Tk()
+        window2 = Toplevel()
         window2.geometry("200x200")
         window2.configure(bg='powderblue')
         lblTitle = Label(window2, text="Update Phone", font="Arial,12", bg="Yellow")
@@ -249,10 +261,9 @@ def update():
             print(ph_no, " Updated in DataBase")
 
         Button(window2, text="Update Phone", command=update2).pack(side=BOTTOM)
-        window2.mainloop()
 
     def update_email():
-        window3 = Tk()
+        window3 = Toplevel()
         window3.geometry("200x200")
         window3.configure(bg='powderblue')
         lblTitle = Label(window3, text="Update Email", font="Arial,12", bg="Yellow")
@@ -286,10 +297,9 @@ def update():
             print(email, " Updated in DataBase")
 
         Button(window3, text="Update Email", command=update3).pack(side=BOTTOM)
-        window3.mainloop()
 
     def update_address():
-        window4 = Tk()
+        window4 = Toplevel()
         window4.geometry("200x200")
         window4.configure(bg='powderblue')
         lblTitle = Label(window4, text="Update Address", font="Arial,12", bg="Yellow")
@@ -323,7 +333,6 @@ def update():
             print(address, " Updated in DataBase")
 
         Button(window4, text="Update Address", command=update4).pack(side=BOTTOM)
-        window4.mainloop()
 
     b1 = Button(win1, text="Update Customer Name", command=update_name)
     b2 = Button(win1, text="Update Customer Phone", command=update_phone)
@@ -334,11 +343,10 @@ def update():
     b2.pack()
     b3.pack()
     b4.pack()
-    win1.mainloop()
 
 
 def delete():
-    root = Tk()
+    root = Toplevel()
 
     lblname = Label(root, text="Enter Customer  ID")
     lblname.pack()
@@ -363,11 +371,10 @@ def delete():
             print(name, 'Record not deleted')
 
     Button(root, text="Delete", command=DeleteIt).pack(side=BOTTOM)
-    root.mainloop()
 
 
 def view():
-    root2 = Tk()
+    root2 = Toplevel()
 
     lblname = Label(root2, text="Select Customer ID")
     lblname.pack()
@@ -391,7 +398,6 @@ def view():
             print(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
 
     Button(root2, text="Show", command=ShowIt).pack(side=BOTTOM)
-    root2.mainloop()
 
 
 def view_all():
@@ -408,7 +414,7 @@ def view_all():
 
 
 def view_sales():
-    root2 = Tk()
+    root2 = Toplevel()
 
     lblsales_id = Label(root2, text="Your Sales ID")
     lblsales_id.pack()
@@ -433,11 +439,10 @@ def view_sales():
         print('Gross Sales:', total)
 
     Button(root2, text="Show", command=ShowIt).pack(side=BOTTOM)
-    root2.mainloop()
 
 
 def customer_all():
-    win = Tk()
+    win = Toplevel()
     win.geometry("400x400")
     win.configure(bg='bisque')
     lblTitle = Label(win, text="SELECT YOUR CHOICE!!!!", font="Arial,16", bg="Yellow")
@@ -454,7 +459,6 @@ def customer_all():
     b4.pack()
     b5.pack()
     b6.pack()
-    win.mainloop()
 
 
 def login():
@@ -488,7 +492,7 @@ def login():
         if userdict[user] == password:
 
             messagebox.showinfo("SUCCESS", "WELCOME BACK " + user)
-            sales_id_user = sales_ids[user]
+            sales_id_user = sales_ids_dict[user]
             loginwindow.destroy()
 
             # customer_all()
@@ -500,10 +504,9 @@ def login():
 
         Label(loginwindow, text="wrong username", font="Arial,12", bg="Yellow").pack()
 
-    loginwindow.mainloop()
-
 
 def welcome_page():
+    global welcome
     text1 = '''Welcome to customer relations management 
 
     please enter your designated username and password
@@ -524,11 +527,13 @@ def welcome_page():
     okbutton.pack()
     welcome.mainloop()
 
-
 # login page starts here label and entry ko side by side kar de
 def login_front():
+    welcome.destroy()
+
     global loginwindow, usernameentry, passwordentry
-    loginwindow = Tk()
+
+    loginwindow = Toplevel()
 
     loginwindow.geometry("300x170")
 
@@ -552,11 +557,9 @@ def login_front():
 
     loginbutton.pack()
 
-    loginwindow.mainloop()
-
 
 def selection_leads():
-    win = Tk()
+    win = Toplevel()
     win.geometry("300x170")
     win.configure(bg='bisque')
     lblTitle = Label(win, text="SELECT YOUR CHOICE!!!!", font="Arial,16", bg="Yellow")
@@ -572,7 +575,7 @@ def selection_leads():
 
 
 def add_leads():
-    window = Tk()
+    window = Toplevel()
     window.geometry('300x330')
     window.configure(bg='pink')
     lb_title = Label(window, text='ADD LEADS', font="Arial,10", bg="Yellow")
@@ -636,11 +639,10 @@ def add_leads():
             print('Please enter a future date')
 
     Button(window, text="Save", command=Save).pack(side=BOTTOM)
-    window.mainloop()
 
 
 def delete_leads():
-    root = Tk()
+    root = Toplevel()
 
     lblTitle = Label(root, text="Enter Cust_ID", font="Arial,16", bg="Yellow")
     lblTitle.pack()
@@ -663,11 +665,10 @@ def delete_leads():
             print(name, 'Record not deleted')
 
     Button(root, text="Delete", command=DeleteIt_leads).pack(side=BOTTOM)
-    root.mainloop()
 
 
 def view_leads():
-    root2 = Tk()
+    root2 = Toplevel()
     combo = cb(root2, values=cust_ids_customer, width=15, height=20)
     combo.set('Select customer ID')
     combo.pack()
@@ -690,7 +691,6 @@ def view_leads():
             print(row[0], row[1], row[2], row[3], row[4])
 
     Button(root2, text="Show", command=ShowIt).pack(side=BOTTOM)
-    root2.mainloop()
 
 
 def view_all_leads():
@@ -707,7 +707,7 @@ def view_all_leads():
 
 
 def add_salesman():
-    win = Tk()
+    win = Toplevel()
     win.geometry("400x400")
     win.configure(bg='bisque')
     Label(win, text="Enter Employee Name", bg='Yellow', fg='red').pack()
@@ -720,24 +720,62 @@ def add_salesman():
     def process():
         key = entrykey.get()
         password = entrypassword.get()
+        f2 = open('salesids','rb+')
         f = open('users', 'rb+')
+        f3 = open('count_check','r+')
+        sales_ids_dict = p.load(f2)
         userdict = p.load(f)
+        salesidcount = f3.read()
         if key in userdict.keys():
-            return 'employee already exists'
+            print('Employee already exists')
         else:
             userdict[key] = password
             f.seek(0)
             p.dump(userdict, f)
-            print('EMPLOYEE ADDED:', userdict)
+            f.flush()
+            userdict = p.load(f)
+            salesidcount=str(int(salesidcount)+1)
+            sales_ids_dict[key]=salesidcount
+            p.dump(sales_ids_dict,f2)
+            f3.write(salesidcount)
+            print('EMPLOYEE ADDED:', userdict,sales_ids_dict)
+        f3.flush()
+        f3.close()
+        f2.flush()
+        f2.close()
         f.flush()
         f.close()
 
     Button(win, text='add', command=process).pack()
-    win.mainloop()
+
+def view_sales_manager():
+    win = Toplevel()
+    win.geometry("400x400")
+    win.configure(bg='bisque')
+    Label(win, text="Enter Employee ID", bg='Yellow', fg='red').pack()
+    entryid = Entry(win)
+    entryid.pack()
+    def ShowIt():
+        print(entryid.get(), ':checking sales id')
+
+        sql = "select value from customer where sales_id = '{}'".format(entryid.get())
+        sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                       database='project', port=3306, auth_plugin='mysql_native_password')
+
+        cursor = sql_connection.cursor()
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        sales_list = [x[0] for x in rows]
+        sales_list = list(map(int, sales_list))
+        print(sales_list)
+        total = sum(sales_list)
+        print('Gross Sales:', total)
+
+    Button(win, text="Show", command=ShowIt).pack(side=BOTTOM)
 
 
 def update_salesman():
-    update = Tk()
+    update = Toplevel()
     update.geometry("400x400")
     update.configure(bg='bisque')
     Label(update, text='UPDATE MENU', bg='Yellow', fg='red').pack()
@@ -750,7 +788,7 @@ def update_salesman():
 
     def update_user():
         global process
-        update1 = Tk()
+        update1 = Toplevel()
         update1.geometry("400x400")
         update1.configure(bg='bisque')
         old = entryold.get()
@@ -777,7 +815,7 @@ def update_salesman():
 
     def update_password():
         global process2
-        update2 = Tk()
+        update2 = Toplevel()
         update2.geometry("400x400")
         update2.configure(bg='bisque')
         old = entryold.get()
@@ -803,7 +841,7 @@ def update_salesman():
 
 
 def fire_salesman():
-    update3 = Tk()
+    update3 = Toplevel()
     update3.geometry("400x400")
     update3.configure(bg='bisque')
     Label(update3, text='FIRE!!!', bg='Yellow', fg='red').pack()
@@ -814,16 +852,24 @@ def fire_salesman():
 
     def process():
         if entryold.get() in list(userdict.keys()):
-            del userdict[entryold.get()]
-            return 'Employee fired successfully!. Nice job!'
+            if entryold.get()=='admin':
+                print('Sorry! You cannot resign.')
+            else:
+                del userdict[entryold.get()]
+                print('Employee fired successfully!. Nice job!')
+                print(userdict)
+                f = open('users', 'wb+')
+                p.dump(userdict, f)
+                f.flush()
+                f.close()
         else:
-            return 'Employee doesnt exist'
+            print('Employee doesnt exist')
 
     Button(update3, text='Fire!!!', command=process, bg='black', fg='red').pack()
 
 
 def plots():
-    plotswin = Tk()
+    plotswin = Toplevel()
     plotswin.geometry('300x300')
     plotswin.configure(bg='burlywood1')
 
@@ -866,13 +912,7 @@ def plots():
     def pie_totalsales_vs_salesman():
         labels = id_list_final
         sizes = total_sales_list_final
-        colors = ['AntiqueWhite3', 'CadetBlue2', 'DarkOliveGreen2', 'DarkSeaGreen4', 'IndianRed2', 'LightSteelBlue4',
-                  'LightYellow2', 'LightYellow3', 'LightYellow4', 'MediumOrchid1', 'MediumOrchid2', 'MediumOrchid3',
-                  'MediumOrchid4', 'MediumPurple1', 'MediumPurple2', 'MediumPurple3', 'MediumPurple4', 'MistyRose2',
-                  'MistyRose3', 'MistyRose4', 'NavajoWhite2', 'NavajoWhite3', 'NavajoWhite4', 'OliveDrab1',
-                  'OliveDrab2', 'OliveDrab4', 'OrangeRed2', 'OrangeRed3', 'OrangeRed4', 'PaleGreen1', 'PaleGreen2',
-                  'PaleGreen3', 'PaleGreen4', 'PaleTurquoise1', 'PaleTurquoise2', 'PaleTurquoise3', 'PaleTurquoise4',
-                  'PaleVioletRed1', 'PaleVioletRed2', 'PaleVioletRed3']
+        colors = ['red','blue','green','yellow','orange','white']
         explode = []
         for i in total_sales_list_final:
             if i > 10000:
@@ -890,7 +930,7 @@ def plots():
 
 
 def manager_page():
-    win = Tk()
+    win = Toplevel()
     win.geometry("400x400")
     win.configure(bg='bisque')
     lblTitle = Label(win, text="SELECT YOUR CHOICE!!!!", font="Arial,16", bg="Yellow")
@@ -900,7 +940,7 @@ def manager_page():
     b3 = Button(win, text="Fire Salesman", command=fire_salesman, fg="orange")
     b4 = Button(win, text="View Customer", command=view, fg="green")
     b5 = Button(win, text="View All Customers", command=view_all, fg="blue")
-    b6 = Button(win, text="View sales", command=view_sales, fg='IndianRed4')
+    b6 = Button(win, text="View sales", command=view_sales_manager, fg='IndianRed4')
     b7 = Button(win, text='Map Graphs', command=plots, fg='Powder Blue')
     b1.pack()
     b2.pack()
@@ -909,12 +949,11 @@ def manager_page():
     b5.pack()
     b6.pack()
     b7.pack()
-    win.mainloop()
 
 
 # both are same as customer only small changes
 def selection():
-    win = Tk()
+    win = Toplevel()
     win.geometry("300x170")
     win.configure(bg='bisque')
     lblTitle = Label(win, text="SELECT YOUR CHOICE!!!!", font="Arial,16", bg="Yellow")
@@ -923,8 +962,6 @@ def selection():
     b2 = Button(win, text="Orders", command=customer_all, fg="purple")
     b1.pack()
     b2.pack()
-
-    win.mainloop()
 
 
 welcome_page()
