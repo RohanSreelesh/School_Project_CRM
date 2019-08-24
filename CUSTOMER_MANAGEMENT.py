@@ -8,7 +8,7 @@ import numpy as np
 import random
 import time
 
-mysql_password = 'Rohan2002'
+mysql_password = '1234'
 hostname = 'localhost'
 salesidcount=3
 f3 = open('count_check','w+')
@@ -58,7 +58,7 @@ cursor_main.execute('create database if not exists project')
 cursor_main.execute('use project;')
 
 cursor_main.execute(
-    'create table if not exists customer (sales_id varchar(10) unique,cust_id varchar(10) unique,name varchar(100) '
+    'create table if not exists customer (sales_id varchar(10),cust_id varchar(10) unique,name varchar(100) '
     ',phone_no varchar(10),email varchar(100),gender varchar(6),address varchar(500),mode varchar('
     '10),value varchar(10));')
 
@@ -67,13 +67,17 @@ cursor_main.execute(
     'phone_no varchar(10) , '
     'next_meeting varchar(30));')
 
+cursor_main.execute('select cust_id from customer;')
+rows=cursor_main.fetchall()
+for i in rows:
+    cust_ids_customer.append(i[0])
 
 def delete_Check():
     messagebox.askyesno('DELETE', 'DO YOU REALLY WANT TO DELETE')
 
 
 def add():
-    global rando_id
+    global rando_id, cust_ids_customer
     window = Toplevel()
     window.geometry("330x300")
     window.configure(bg='pink')
@@ -149,7 +153,7 @@ def add():
         address = entryaddress.get()
         mode = entrypayment_mode.get()
         value = entrypayment.get()
-        if value > 0:
+        if int(value) > 0:
             print(sales_id, cust_id, name, ph_no, email, gender, address, mode, value)
             sql = "insert into customer values('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(sales_id,
                                                                                                              cust_id,
@@ -355,7 +359,7 @@ def delete():
                                        database='project', port=3306, auth_plugin='mysql_native_password')
 
         cursor = sql_connection.cursor()
-        if delete_Check() == True:
+        if delete_Check():
             cursor.execute(sql)
             sql_connection.commit()
             print(name, " Deleted from DataBase")
@@ -370,16 +374,13 @@ def view():
 
     lblname = Label(root2, text="Select Customer ID")
     lblname.pack()
-
     entryname = cb(root2, value=cust_ids_customer, width=10, height=10)
     entryname.set('Choose Id')
     entryname.pack()
 
     def ShowIt():
         name = entryname.get()
-        print(name)
-
-        sql = "select * from customer where name = '{}'".format(name)
+        sql = "select * from customer where cust_id = '{}'".format(name)
         sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                        database='project', port=3306, auth_plugin='mysql_native_password')
 
@@ -606,7 +607,8 @@ def add_leads():
 
     entry_lbl_meet = Entry(window)
     entry_lbl_meet.place(x=160, y=130)
-    print(time.strftime("%d%m%Y"))
+    date_today = time.strftime("%d%m%Y")
+    print(date_today)
 
     def Save():  # for orders
         cust_id = cust_id_lead
@@ -614,7 +616,35 @@ def add_leads():
         category = combo_custtype.get()
         phone = entry_lblph_no.get()
         meet = entry_lbl_meet.get()
-        if meet > time.strftime("%d%m%Y"):
+        print(type(meet))
+        print(type(date_today))
+        if int(meet[2:4]) > int(date_today[2:4]):
+            print(cust_id, name, category, phone, meet)
+            sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
+
+            sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                           database='project', port=3306, auth_plugin='mysql_native_password')
+
+            cursor = sql_connection.cursor()
+            cursor.execute(sql)
+
+            sql_connection.commit()
+
+            print(name, " Saved in DataBase")
+        elif int(meet[4:])>int(date_today[4:]):
+            print(name, category, phone, meet)
+            sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
+
+            sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                           database='project', port=3306, auth_plugin='mysql_native_password')
+
+            cursor = sql_connection.cursor()
+            cursor.execute(sql)
+
+            sql_connection.commit()
+
+            print(name, " Saved in DataBase")
+        elif int(meet[2:4]) == int(date_today[2:4]) and int(meet[0:3])>int(date_today[0:3]):
             print(name, category, phone, meet)
             sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
 
@@ -650,7 +680,7 @@ def delete_leads():
         sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                        database='project', port=3306, auth_plugin='mysql_native_password')
         cursor = sql_connection.cursor()
-        if delete_Check() == True:
+        if delete_Check():
             cursor.execute(sql)
             print(name, 'Deleted from database')
         else:
