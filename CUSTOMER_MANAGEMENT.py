@@ -188,7 +188,7 @@ def add():
 
 def update():
     win1 = Toplevel()
-    win1.geometry(400 * 400)
+    win1.geometry("330x300")
     win1.configure(bg='bisque')
 
     def update_name():
@@ -688,6 +688,7 @@ def delete_leads():
         cursor = sql_connection.cursor()
         if delete_Check():
             cursor.execute(sql)
+            sql_connection.commit()
             print(name, 'Deleted from database')
         else:
             print(name, 'Record not deleted')
@@ -702,7 +703,7 @@ def view_leads():
     combo.pack()
 
     entryname = combo.get()
-    entryname.pack()
+    #entryname.pack()
 
     def ShowIt():
         name = combo.get()
