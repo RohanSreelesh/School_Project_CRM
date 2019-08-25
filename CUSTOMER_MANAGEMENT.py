@@ -157,7 +157,7 @@ def add():
         address = entryaddress.get()
         mode = entrypayment_mode.get()
         value = entrypayment.get()
-        if int(value) > 0:
+        if int(value) > 0 and entrypayment_mode!='' and gender!='Genders':
             print(sales_id, cust_id, name, ph_no, email, gender, address, mode, value)
             sql = "insert into customer values('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(sales_id,
                                                                                                              cust_id,
@@ -608,7 +608,7 @@ def add_leads():
     entry_lblph_no = Entry(window)
     entry_lblph_no.place(x=160, y=110)
 
-    lbl_meet = Label(window, text="Next meeting ('ddmmyy')")  # put date picker here
+    lbl_meet = Label(window, text="Next meeting ('ddmmyyyy')")  # put date picker here
     lbl_meet.place(x=10, y=130)
 
     entry_lbl_meet = Entry(window)
@@ -624,7 +624,7 @@ def add_leads():
         meet = entry_lbl_meet.get()
         print(type(meet))
         print(type(date_today))
-        if int(meet[2:4]) > int(date_today[2:4]) and int(meet[4:]) == int(date_today[4:]):
+        if (int(meet[2:4]) > int(date_today[2:4]) and int(meet[4:]) == int(date_today[4:])) and category!='Select':
             print(cust_id, name, category, phone, meet)
             sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
 
@@ -637,7 +637,7 @@ def add_leads():
             sql_connection.commit()
 
             print(name, " Saved in DataBase")
-        elif int(meet[4:]) > int(date_today[4:]):
+        elif (int(meet[4:]) > int(date_today[4:])) and category!='Select':
             print(cust_id, name, category, phone, meet)
             sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
 
@@ -650,8 +650,8 @@ def add_leads():
             sql_connection.commit()
 
             print(name, " Saved in DataBase")
-        elif (int(meet[2:4]) == int(date_today[2:4] and int(meet[4:]) == int(date_today[4:]))) and int(meet[0:3]) > int(
-                date_today[0:3]):
+        elif ((int(meet[2:4]) == int(date_today[2:4] and int(meet[4:]) == int(date_today[4:]))) and int(meet[0:3]) > int(
+                date_today[0:3])) and category!='Select':
             print(cust_id, name, category, phone, meet)
             sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
 
@@ -768,10 +768,10 @@ def add_salesman():
             userdict = p.load(f)
             sales_id_count = str(int(sales_id_count) + 1)
             sales_ids_dict[key] = sales_id_count
+            f2.seek(0)
             p.dump(sales_ids_dict, f2)
             f2.flush()
             f2.seek(0)
-            sales_ids_dict = p.load(f2)
             f3.write(sales_id_count)
             print('EMPLOYEE ADDED:', userdict, sales_ids_dict)
         f3.flush()
@@ -919,7 +919,6 @@ def plots():
         cursor = sql_connection.cursor()
 
         cursor.execute('select sales_id from customer')
-        # print(cursor.fetchall())
         id_list = [x[0] for x in cursor.fetchall()]
         print('id', id_list)
         for i in id_list:
@@ -976,9 +975,7 @@ def plots():
         cursor = sql_connection.cursor()
 
         cursor.execute('select mode from customer')
-        # print(cursor.fetchall())
         mode_list = [x[0] for x in cursor.fetchall()]
-        print('id', mode_list)
         for i in mode_list:
             if i == 'Cash':
                 cash += 1
@@ -988,17 +985,13 @@ def plots():
                 other += 1
 
         sizes = [cash, card, other]
-
-        # some error pls fix
         for i in range(0, len(sizes) - 1):
-            print(i)
             if sizes[i] == 0:
                 sizes.pop(i)
                 labels.pop(i)
 
-        print(sizes)
         for i in sizes:
-            explode.append(0)
+            explode.append(0.0)
         plt.pie(sizes, explode=explode, labels=labels, colors=colors,
                 autopct='%03.1f%%', shadow=True, startangle=140)
         plt.show()
@@ -1044,15 +1037,15 @@ def selection():
 
 
 with open('check.txt', 'r+') as f1:
-    if f1.read() == '1':
+    k=f1.read()
+    if int(k) ==1:
         pass
     else:
+        f1.seek(0)
         createsalesidfile()
         createuserfile()
         f1.write('1')
 
 import_salesids()
 import_userdict()
-print(userdict)
-print(sales_ids_dict)
 welcome_page()
