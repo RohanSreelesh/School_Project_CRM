@@ -26,7 +26,7 @@ def createuserfile():
 
 def createsalesidfile():
     sales_ids = {'admin': 'Null', 'avig': '2', 'rohan': '1', 'rishabh': '3'}
-    f = open('salesids', 'wb+')
+    f = open('salesids1', 'wb+')
     p.dump(sales_ids, f)
     f.flush()
     f.close()
@@ -41,7 +41,7 @@ def import_userdict():
 
 def import_salesids():
     global sales_ids_dict
-    f = open('salesids', 'rb+')
+    f = open('salesids1', 'rb+')
     sales_ids_dict = p.load(f)
     f.close()
 
@@ -77,7 +77,7 @@ for i in rows:
 
 
 def delete_Check():
-    messagebox.askyesno('DELETE', 'DO YOU REALLY WANT TO DELETE')
+    return messagebox.askyesno('DELETE', 'DO YOU REALLY WANT TO DELETE')
 
 
 def add():
@@ -751,7 +751,7 @@ def add_salesman():
     def process():
         key = entrykey.get()
         password = entrypassword.get()
-        f2 = open('salesids', 'rb+')
+        f2 = open('salesids1', 'rb+')
         f = open('users', 'rb+')
         sales_ids_dict = p.load(f2)
         userdict = p.load(f)
@@ -769,6 +769,9 @@ def add_salesman():
             sales_id_count = str(int(sales_id_count) + 1)
             sales_ids_dict[key] = sales_id_count
             p.dump(sales_ids_dict, f2)
+            f2.flush()
+            f2.seek(0)
+            sales_ids_dict = p.load(f2)
             f3.write(sales_id_count)
             print('EMPLOYEE ADDED:', userdict, sales_ids_dict)
         f3.flush()
