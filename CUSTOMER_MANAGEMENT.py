@@ -1036,8 +1036,8 @@ def selection():
     b2.pack()
 
 
-with open('check.txt', 'r+') as f1:
-    k=f1.read()
+with open('check.txt', 'a+') as f1:
+    k=f1.read()[0]
     if int(k) ==1:
         pass
     else:
