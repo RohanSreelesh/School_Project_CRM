@@ -8,16 +8,13 @@ import numpy as np
 import random
 import time
 
-mysql_password = 'Rohan2002'
+mysql_password = '1234'
 hostname = 'localhost'
-salesidcount=3
-f3 = open('count_check','w+')
-f3.write(str(salesidcount))
-f3.close()
 cust_ids_customer = []
 cust_ids_leads = []
 total_sales_list_final = []
 id_list_final = []
+
 
 def createuserfile():
     userdict = {'admin': '1234', 'avig': '1234', 'rohan': '1234', 'rishabh': '1234'}
@@ -25,6 +22,8 @@ def createuserfile():
     p.dump(userdict, f)
     f.flush()
     f.close()
+
+
 def createsalesidfile():
     sales_ids = {'admin': 'Null', 'avig': '2', 'rohan': '1', 'rishabh': '3'}
     f = open('salesids', 'wb+')
@@ -33,19 +32,18 @@ def createsalesidfile():
     f.close()
 
 
-
 def import_userdict():
     global userdict
     f = open('users', 'rb+')
     userdict = p.load(f)
     f.close()
+
+
 def import_salesids():
     global sales_ids_dict
-    f = open('salesids','rb+')
+    f = open('salesids', 'rb+')
     sales_ids_dict = p.load(f)
     f.close()
-
-
 
 
 sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
@@ -68,14 +66,15 @@ cursor_main.execute(
     'next_meeting varchar(30));')
 
 cursor_main.execute('select cust_id from customer;')
-rows=cursor_main.fetchall()
+rows = cursor_main.fetchall()
 for i in rows:
     cust_ids_customer.append(i[0])
 
 cursor_main.execute('select cust_id from leads;')
-rows=cursor_main.fetchall()
+rows = cursor_main.fetchall()
 for i in rows:
     cust_ids_leads.append(i[0])
+
 
 def delete_Check():
     messagebox.askyesno('DELETE', 'DO YOU REALLY WANT TO DELETE')
@@ -525,6 +524,7 @@ def welcome_page():
     okbutton.pack()
     welcome.mainloop()
 
+
 # login page starts here label and entry ko side by side kar de
 def login_front():
     welcome.destroy()
@@ -624,7 +624,7 @@ def add_leads():
         meet = entry_lbl_meet.get()
         print(type(meet))
         print(type(date_today))
-        if int(meet[2:4]) > int(date_today[2:4]) and int(meet[4:])==int(date_today[4:]) :
+        if int(meet[2:4]) > int(date_today[2:4]) and int(meet[4:]) == int(date_today[4:]):
             print(cust_id, name, category, phone, meet)
             sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
 
@@ -637,7 +637,7 @@ def add_leads():
             sql_connection.commit()
 
             print(name, " Saved in DataBase")
-        elif int(meet[4:])>int(date_today[4:]):
+        elif int(meet[4:]) > int(date_today[4:]):
             print(cust_id, name, category, phone, meet)
             sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
 
@@ -650,7 +650,8 @@ def add_leads():
             sql_connection.commit()
 
             print(name, " Saved in DataBase")
-        elif (int(meet[2:4]) == int(date_today[2:4] and int(meet[4:])==int(date_today[4:]))) and int(meet[0:3])>int(date_today[0:3]) :
+        elif (int(meet[2:4]) == int(date_today[2:4] and int(meet[4:]) == int(date_today[4:]))) and int(meet[0:3]) > int(
+                date_today[0:3]):
             print(cust_id, name, category, phone, meet)
             sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
 
@@ -703,7 +704,8 @@ def view_leads():
     combo.pack()
 
     entryname = combo.get()
-    #entryname.pack()
+
+    # entryname.pack()
 
     def ShowIt():
         name = combo.get()
@@ -749,12 +751,12 @@ def add_salesman():
     def process():
         key = entrykey.get()
         password = entrypassword.get()
-        f2 = open('salesids','rb+')
+        f2 = open('salesids', 'rb+')
         f = open('users', 'rb+')
-        f3 = open('count_check','r+')
         sales_ids_dict = p.load(f2)
         userdict = p.load(f)
-        salesidcount = f3.read()
+        sales_id_count = list(sales_ids_dict.values())[-1]
+        f3 = open('sales_id_latest','w+')
         if key in userdict.keys():
             print('Employee already exists')
         else:
@@ -764,11 +766,11 @@ def add_salesman():
             f.flush()
             f.seek(0)
             userdict = p.load(f)
-            salesidcount=str(int(salesidcount)+1)
-            sales_ids_dict[key]=salesidcount
-            p.dump(sales_ids_dict,f2)
-            f3.write(salesidcount)
-            print('EMPLOYEE ADDED:', userdict,sales_ids_dict)
+            sales_id_count = str(int(sales_id_count) + 1)
+            sales_ids_dict[key] = sales_id_count
+            p.dump(sales_ids_dict, f2)
+            f3.write(sales_id_count)
+            print('EMPLOYEE ADDED:', userdict, sales_ids_dict)
         f3.flush()
         f3.close()
         f2.flush()
@@ -778,6 +780,7 @@ def add_salesman():
 
     Button(win, text='add', command=process).pack()
 
+
 def view_sales_manager():
     win = Toplevel()
     win.geometry("400x400")
@@ -785,6 +788,7 @@ def view_sales_manager():
     Label(win, text="Enter Employee ID", bg='Yellow', fg='red').pack()
     entryid = Entry(win)
     entryid.pack()
+
     def ShowIt():
         print(entryid.get(), ':checking sales id')
 
@@ -882,7 +886,7 @@ def fire_salesman():
 
     def process():
         if entryold.get() in list(userdict.keys()):
-            if entryold.get()=='admin':
+            if entryold.get() == 'admin':
                 print('Sorry! You cannot resign.')
             else:
                 del userdict[entryold.get()]
@@ -912,9 +916,9 @@ def plots():
         cursor = sql_connection.cursor()
 
         cursor.execute('select sales_id from customer')
-        #print(cursor.fetchall())
+        # print(cursor.fetchall())
         id_list = [x[0] for x in cursor.fetchall()]
-        print('id',id_list)
+        print('id', id_list)
         for i in id_list:
             if i not in id_list_final:
                 id_list_final.append(i)
@@ -944,7 +948,7 @@ def plots():
     def pie_totalsales_vs_salesman():
         labels = id_list_final
         sizes = total_sales_list_final
-        colors = ['red','blue','green','yellow','orange','white']
+        colors = ['red', 'blue', 'green', 'yellow', 'orange', 'white']
         explode = []
         for i in total_sales_list_final:
             if i > 100000:
@@ -958,12 +962,12 @@ def plots():
         plt.show()
 
     def payment_method_pie():
-        cash=0
-        card=0
-        other=0
+        cash = 0
+        card = 0
+        other = 0
         colors = ['red', 'blue', 'green', 'yellow', 'orange', 'white']
-        explode=[]
-        labels=['cash','card','other']
+        explode = []
+        labels = ['cash', 'card', 'other']
         sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                        database='project', port=3306, auth_plugin='mysql_native_password')
         cursor = sql_connection.cursor()
@@ -973,22 +977,21 @@ def plots():
         mode_list = [x[0] for x in cursor.fetchall()]
         print('id', mode_list)
         for i in mode_list:
-            if i=='Cash':
-                cash+=1
-            elif i=='Card':
-                card+=1
+            if i == 'Cash':
+                cash += 1
+            elif i == 'Card':
+                card += 1
             else:
-                other+=1
+                other += 1
 
-        sizes=[cash,card,other]
+        sizes = [cash, card, other]
 
-        #some error pls fix
-        for i in range(0,len(sizes)-1):
+        # some error pls fix
+        for i in range(0, len(sizes) - 1):
             print(i)
-            if sizes[i]==0:
+            if sizes[i] == 0:
                 sizes.pop(i)
                 labels.pop(i)
-
 
         print(sizes)
         for i in sizes:
@@ -997,12 +1000,9 @@ def plots():
                 autopct='%03.1f%%', shadow=True, startangle=140)
         plt.show()
 
-
-
     Button(plotswin, text='View Salesman vs Total Sales Graph', command=total_sales_vs_salesman).pack()
     Button(plotswin, text='View Salesman vs Total Sales Graph in Pie', command=pie_totalsales_vs_salesman).pack()
     Button(plotswin, text='Pie test', command=payment_method_pie).pack()
-
 
 
 def manager_page():
@@ -1038,6 +1038,7 @@ def selection():
     b2 = Button(win, text="Orders", command=customer_all, fg="purple")
     b1.pack()
     b2.pack()
+
 
 with open('check.txt', 'r+') as f1:
     if f1.read() == '1':
