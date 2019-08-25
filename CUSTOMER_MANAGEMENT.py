@@ -8,7 +8,7 @@ import numpy as np
 import random
 import time
 
-mysql_password = '1234'
+mysql_password = 'Rohan2002'
 hostname = 'localhost'
 salesidcount=3
 f3 = open('count_check','w+')
@@ -761,6 +761,7 @@ def add_salesman():
             f.seek(0)
             p.dump(userdict, f)
             f.flush()
+            f.seek(0)
             userdict = p.load(f)
             salesidcount=str(int(salesidcount)+1)
             sales_ids_dict[key]=salesidcount
@@ -910,7 +911,9 @@ def plots():
         cursor = sql_connection.cursor()
 
         cursor.execute('select sales_id from customer')
+        #print(cursor.fetchall())
         id_list = [x[0] for x in cursor.fetchall()]
+        print('id',id_list)
         for i in id_list:
             if i not in id_list_final:
                 id_list_final.append(i)
@@ -943,7 +946,7 @@ def plots():
         colors = ['red','blue','green','yellow','orange','white']
         explode = []
         for i in total_sales_list_final:
-            if i > 10000:
+            if i > 100000:
                 explode.append(0.2)
             else:
                 explode.append(0)
@@ -953,8 +956,52 @@ def plots():
         plt.axis('equal')
         plt.show()
 
+    def payment_method_pie():
+        cash=0
+        card=0
+        other=0
+        colors = ['red', 'blue', 'green', 'yellow', 'orange', 'white']
+        explode=[]
+        labels=['cash','card','other']
+        sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                       database='project', port=3306, auth_plugin='mysql_native_password')
+        cursor = sql_connection.cursor()
+
+        cursor.execute('select mode from customer')
+        # print(cursor.fetchall())
+        mode_list = [x[0] for x in cursor.fetchall()]
+        print('id', mode_list)
+        for i in mode_list:
+            if i=='Cash':
+                cash+=1
+            elif i=='Card':
+                card+=1
+            else:
+                other+=1
+
+        sizes=[cash,card,other]
+
+        #some error pls fix
+        for i in range(0,len(sizes)-1):
+            print(i)
+            if sizes[i]==0:
+                sizes.pop(i)
+                labels.pop(i)
+
+
+        print(sizes)
+        for i in sizes:
+            explode.append(0)
+        plt.pie(sizes, explode=explode, labels=labels, colors=colors,
+                autopct='%03.1f%%', shadow=True, startangle=140)
+        plt.show()
+
+
+
     Button(plotswin, text='View Salesman vs Total Sales Graph', command=total_sales_vs_salesman).pack()
     Button(plotswin, text='View Salesman vs Total Sales Graph in Pie', command=pie_totalsales_vs_salesman).pack()
+    Button(plotswin, text='Pie test', command=payment_method_pie).pack()
+
 
 
 def manager_page():
@@ -991,7 +1038,7 @@ def selection():
     b1.pack()
     b2.pack()
 
-with open('check.txt', 'w+') as f1:
+with open('check.txt', 'r+') as f1:
     if f1.read() == '1':
         pass
     else:
