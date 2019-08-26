@@ -8,7 +8,7 @@ import numpy as np
 import random
 import time
 
-mysql_password = '1234'
+mysql_password = ''
 hostname = 'localhost'
 cust_ids_customer = []
 cust_ids_leads = []
@@ -54,7 +54,6 @@ cursor_main = sql_connection.cursor()
 cursor_main.execute('create database if not exists project')
 
 cursor_main.execute('use project;')
-
 cursor_main.execute(
     'create table if not exists customer (sales_id varchar(10),cust_id varchar(10) unique,name varchar(100) '
     ',phone_no varchar(10),email varchar(100),gender varchar(6),address varchar(500),mode varchar('
@@ -531,7 +530,7 @@ def login_front():
 
     global loginwindow, usernameentry, passwordentry
 
-    loginwindow = Toplevel()
+    loginwindow = Tk()
 
     loginwindow.geometry("300x170")
 
@@ -624,48 +623,51 @@ def add_leads():
         meet = entry_lbl_meet.get()
         print(type(meet))
         print(type(date_today))
-        if (int(meet[2:4]) > int(date_today[2:4]) and int(meet[4:]) == int(date_today[4:])) and category!='Select':
-            print(cust_id, name, category, phone, meet)
-            sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
-
-            sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
-                                           database='project', port=3306, auth_plugin='mysql_native_password')
-
-            cursor = sql_connection.cursor()
-            cursor.execute(sql)
-
-            sql_connection.commit()
-
-            print(name, " Saved in DataBase")
-        elif (int(meet[4:]) > int(date_today[4:])) and category!='Select':
-            print(cust_id, name, category, phone, meet)
-            sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
-
-            sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
-                                           database='project', port=3306, auth_plugin='mysql_native_password')
-
-            cursor = sql_connection.cursor()
-            cursor.execute(sql)
-
-            sql_connection.commit()
-
-            print(name, " Saved in DataBase")
-        elif ((int(meet[2:4]) == int(date_today[2:4] and int(meet[4:]) == int(date_today[4:]))) and int(meet[0:3]) > int(
-                date_today[0:3])) and category!='Select':
-            print(cust_id, name, category, phone, meet)
-            sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
-
-            sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
-                                           database='project', port=3306, auth_plugin='mysql_native_password')
-
-            cursor = sql_connection.cursor()
-            cursor.execute(sql)
-
-            sql_connection.commit()
-
-            print(name, " Saved in DataBase")
+        if (int(meet[0:3])==31 and (int(meet[2:4]) in [1,3,5,7,8,10,11,12])) or (int(meet[0:3])<31 and ((int(meet[2:4]) in [1,3,4,5,6,7,8,9,10,11,12]))) or (int(meet[0:3])==29 and int(meet[2:4])==2 and int(meet[4:0])%4==0) or (int(meet[0:3])<29 and int(meet[2:4])==2) :
+            if (int(meet[2:4]) > int(date_today[2:4]) and int(meet[4:]) == int(date_today[4:])) and category!='Select':
+                print(cust_id, name, category, phone, meet)
+                sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
+    
+                sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                               database='project', port=3306, auth_plugin='mysql_native_password')
+    
+                cursor = sql_connection.cursor()
+                cursor.execute(sql)
+    
+                sql_connection.commit()
+    
+                print(name, " Saved in DataBase")
+            elif (int(meet[4:]) > int(date_today[4:])) and category!='Select':
+                print(cust_id, name, category, phone, meet)
+                sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
+    
+                sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                               database='project', port=3306, auth_plugin='mysql_native_password')
+    
+                cursor = sql_connection.cursor()
+                cursor.execute(sql)
+    
+                sql_connection.commit()
+    
+                print(name, " Saved in DataBase")
+            elif ((int(meet[2:4]) == int(date_today[2:4] and int(meet[4:]) == int(date_today[4:]))) and int(meet[0:3]) > int(
+                    date_today[0:3])) and category!='Select':
+                print(cust_id, name, category, phone, meet)
+                sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
+    
+                sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                               database='project', port=3306, auth_plugin='mysql_native_password')
+    
+                cursor = sql_connection.cursor()
+                cursor.execute(sql)
+    
+                sql_connection.commit()
+    
+                print(name, " Saved in DataBase")
+            else:
+                print('Please enter a future date')
         else:
-            print('Please enter a future date')
+            print('Please check the date and enter a valid date')
 
     Button(window, text="Save", command=Save).pack(side=BOTTOM)
 
@@ -1002,7 +1004,7 @@ def plots():
 
 
 def manager_page():
-    win = Toplevel()
+    win = Tk()
     win.geometry("400x400")
     win.configure(bg='bisque')
     lblTitle = Label(win, text="SELECT YOUR CHOICE!!!!", font="Arial,16", bg="Yellow")
@@ -1025,7 +1027,7 @@ def manager_page():
 
 # both are same as customer only small changes
 def selection():
-    win = Toplevel()
+    win = Tk()
     win.geometry("300x170")
     win.configure(bg='bisque')
     lblTitle = Label(win, text="SELECT YOUR CHOICE!!!!", font="Arial,16", bg="Yellow")
@@ -1036,7 +1038,7 @@ def selection():
     b2.pack()
 
 
-with open('check.txt', 'a+') as f1:
+'''with open('check.txt', 'a+') as f1:
     k=f1.read()[0]
     if int(k) ==1:
         pass
@@ -1044,8 +1046,20 @@ with open('check.txt', 'a+') as f1:
         f1.seek(0)
         createsalesidfile()
         createuserfile()
-        f1.write('1')
+        f1.write('1')'''
 
+
+try:
+    F=open('check.txt')
+    F.close()
+
+
+except:
+    createuserfile()
+    createsalesidfile()
+    F=open('check.txt','w')
+    F.write('1')
+    F.close()
 import_salesids()
 import_userdict()
 welcome_page()
