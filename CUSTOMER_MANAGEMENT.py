@@ -376,6 +376,7 @@ def delete():
         if delete_Check():
             cursor.execute(sql)
             sql_connection.commit()
+            cust_ids_customer.remove(int(name))
             print(name, " Deleted from DataBase")
         else:
             print(name, 'Record not deleted')
@@ -471,8 +472,6 @@ def customer_all():
 def login():
     global loginwindow, usernameentry, passwordentry, sales_id_user
     # this label notifies progress find a way so that it does not stack
-    Label(loginwindow, text="loading", font="Arial,12", bg="Yellow").pack()
-
     user = usernameentry.get()
 
     password = passwordentry.get()
@@ -487,7 +486,6 @@ def login():
 
             loginwindow.destroy()
 
-            # customer_all()
             manager_page()
 
         else:
@@ -502,7 +500,6 @@ def login():
             sales_id_user = sales_ids_dict[user]
             loginwindow.destroy()
 
-            # customer_all()
             selection()
         else:
 
@@ -535,7 +532,6 @@ def welcome_page():
     welcome.mainloop()
 
 
-# login page starts here label and entry ko side by side kar de
 def login_front():
     welcome.destroy()
 
@@ -921,7 +917,6 @@ def fire_salesman():
             print('Employee doesnt exist')
 
     Button(update3, text='Fire!!!', command=process, bg='black', fg='red').pack()
-
 
 def plots():
     plotswin = Toplevel()
