@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 import time
-
+from IPython import get_ipython
+get_ipython().run_line_magic('matplotlib', 'auto')
 mysql_password = ''
 hostname = 'localhost'
 cust_ids_customer = []
@@ -156,29 +157,39 @@ def add():
         address = entryaddress.get()
         mode = entrypayment_mode.get()
         value = entrypayment.get()
-        if int(value) > 0 and entrypayment_mode!='' and gender!='Genders':
-            print(sales_id, cust_id, name, ph_no, email, gender, address, mode, value)
-            sql = "insert into customer values('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(sales_id,
-                                                                                                             cust_id,
-                                                                                                             name,
-                                                                                                             ph_no,
-                                                                                                             email,
-                                                                                                             gender,
-                                                                                                             address,
-                                                                                                             mode,
-                                                                                                             value)
-
-            sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
-                                           database='project', port=3306, auth_plugin='mysql_native_password')
-
-            cursor = sql_connection.cursor()
-            cursor.execute(sql)
-
-            sql_connection.commit()
-
-            print(name, " Saved in DataBase")
+        check=0
+        for i in value:
+            if i in '1234567890':
+                check=True
+            else:
+                check=False
+                break
+        if check==True:
+            if int(value) > 0 and entrypayment_mode!='' and gender!='Genders':
+                print(sales_id, cust_id, name, ph_no, email, gender, address, mode, value)
+                sql = "insert into customer values('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(sales_id,
+                                                                                                                 cust_id,
+                                                                                                                 name,
+                                                                                                                 ph_no,
+                                                                                                                 email,
+                                                                                                                 gender,
+                                                                                                                 address,
+                                                                                                                 mode,
+                                                                                                                 value)
+    
+                sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                               database='project', port=3306, auth_plugin='mysql_native_password')
+    
+                cursor = sql_connection.cursor()
+                cursor.execute(sql)
+    
+                sql_connection.commit()
+    
+                print(name, " Saved in DataBase")
+            else:
+                print("Sales cannot be negative. We don't give out loans")
         else:
-            print("Sales cannot be negative. We don't give out loans")
+            print('Sales can only be integers')
 
     Button(window, text="Save", command=Save).pack(side=BOTTOM)
     window.mainloop()
@@ -613,7 +624,6 @@ def add_leads():
     entry_lbl_meet = Entry(window)
     entry_lbl_meet.place(x=160, y=130)
     date_today = time.strftime("%d%m%Y")
-    print(date_today)
 
     def Save():  # for orders
         cust_id = cust_id_lead
@@ -621,53 +631,61 @@ def add_leads():
         category = combo_custtype.get()
         phone = entry_lblph_no.get()
         meet = entry_lbl_meet.get()
-        print(type(meet))
-        print(type(date_today))
-        if (int(meet[0:3])==31 and (int(meet[2:4]) in [1,3,5,7,8,10,11,12])) or (int(meet[0:3])<31 and ((int(meet[2:4]) in [1,3,4,5,6,7,8,9,10,11,12]))) or (int(meet[0:3])==29 and int(meet[2:4])==2 and int(meet[4:0])%4==0) or (int(meet[0:3])<29 and int(meet[2:4])==2) :
-            if (int(meet[2:4]) > int(date_today[2:4]) and int(meet[4:]) == int(date_today[4:])) and category!='Select':
-                print(cust_id, name, category, phone, meet)
-                sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
-    
-                sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
-                                               database='project', port=3306, auth_plugin='mysql_native_password')
-    
-                cursor = sql_connection.cursor()
-                cursor.execute(sql)
-    
-                sql_connection.commit()
-    
-                print(name, " Saved in DataBase")
-            elif (int(meet[4:]) > int(date_today[4:])) and category!='Select':
-                print(cust_id, name, category, phone, meet)
-                sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
-    
-                sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
-                                               database='project', port=3306, auth_plugin='mysql_native_password')
-    
-                cursor = sql_connection.cursor()
-                cursor.execute(sql)
-    
-                sql_connection.commit()
-    
-                print(name, " Saved in DataBase")
-            elif ((int(meet[2:4]) == int(date_today[2:4] and int(meet[4:]) == int(date_today[4:]))) and int(meet[0:3]) > int(
-                    date_today[0:3])) and category!='Select':
-                print(cust_id, name, category, phone, meet)
-                sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
-    
-                sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
-                                               database='project', port=3306, auth_plugin='mysql_native_password')
-    
-                cursor = sql_connection.cursor()
-                cursor.execute(sql)
-    
-                sql_connection.commit()
-    
-                print(name, " Saved in DataBase")
+        date_check=0
+        for i in meet:
+            if i in '1234567890':
+                date_check=True
             else:
-                print('Please enter a future date')
+                date_check=False
+                break
+        if date_check==True and category!='select':
+            if (int(meet[0:2])==31 and (int(meet[2:4]) in [1,3,5,7,8,10,11,12])) or (int(meet[0:2])<31 and ((int(meet[2:4]) in [1,3,4,5,6,7,8,9,10,11,12]))) or (int(meet[0:2])==29 and int(meet[2:4])==2 and int(meet[4:])%4==0) or (int(meet[0:2])<29 and int(meet[2:4])==2) :
+                if (int(meet[2:4]) > int(date_today[2:4]) and int(meet[4:]) == int(date_today[4:])) and category!='Select':
+                    print(cust_id, name, category, phone, meet)
+                    sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
+        
+                    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                                   database='project', port=3306, auth_plugin='mysql_native_password')
+        
+                    cursor = sql_connection.cursor()
+                    cursor.execute(sql)
+        
+                    sql_connection.commit()
+        
+                    print(name, " Saved in DataBase")
+                elif (int(meet[4:]) > int(date_today[4:])) and category!='Select':
+                    print(cust_id, name, category, phone, meet)
+                    sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
+        
+                    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                                   database='project', port=3306, auth_plugin='mysql_native_password')
+        
+                    cursor = sql_connection.cursor()
+                    cursor.execute(sql)
+        
+                    sql_connection.commit()
+        
+                    print(name, " Saved in DataBase")
+                elif ((int(meet[2:4]) == int(date_today[2:4] and int(meet[4:]) == int(date_today[4:]))) and int(meet[0:2]) > int(
+                        date_today[0:2])) and category!='Select':
+                    print(cust_id, name, category, phone, meet)
+                    sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
+        
+                    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                                   database='project', port=3306, auth_plugin='mysql_native_password')
+        
+                    cursor = sql_connection.cursor()
+                    cursor.execute(sql)
+        
+                    sql_connection.commit()
+        
+                    print(name, " Saved in DataBase")
+                else:
+                    print('Please enter a future date')
+            else:
+                print('Please check the date and enter a valid date')
         else:
-            print('Please check the date and enter a valid date')
+            print('Date can only contain integers')
 
     Button(window, text="Save", command=Save).pack(side=BOTTOM)
 
@@ -683,7 +701,6 @@ def delete_leads():
 
     def DeleteIt_leads():
         name = entryname.get()
-        print(name)
 
         sql = "delete from leads where cust_id = '{}'".format(name)
         sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
@@ -806,7 +823,6 @@ def view_sales_manager():
         rows = cursor.fetchall()
         sales_list = [x[0] for x in rows]
         sales_list = list(map(int, sales_list))
-        print(sales_list)
         total = sum(sales_list)
         print('Gross Sales:', total)
 
@@ -922,12 +938,10 @@ def plots():
 
         cursor.execute('select sales_id from customer')
         id_list = [x[0] for x in cursor.fetchall()]
-        print('id', id_list)
         for i in id_list:
             if i not in id_list_final:
                 id_list_final.append(i)
         id_list_final = list(map(int, id_list_final))
-        print(id_list_final)
 
         for i in id_list:
             cursor.execute("select value from customer where sales_id='{}'".format(i))
@@ -939,14 +953,12 @@ def plots():
         for i in total_sales_list:
             if i not in total_sales_list_final:
                 total_sales_list_final.append(i)
-        print(total_sales_list_final)
         plt.figure()
         plt.bar(np.arange(len(id_list_final)), total_sales_list_final, align='center', alpha=0.5)
         plt.xticks(np.arange(len(id_list_final)), id_list_final)
         plt.ylabel('Total Sale in Rupees')
         plt.xlabel('Sales ID of salesman')
         plt.title('Total sales of each Salesman')
-
         plt.show()
 
     def pie_totalsales_vs_salesman():
@@ -959,7 +971,6 @@ def plots():
                 explode.append(0.2)
             else:
                 explode.append(0)
-        print(explode)
         plt.pie(sizes, explode=explode, labels=labels, colors=colors,
                 autopct='%03.1f%%', shadow=True, startangle=140)
         plt.axis('equal')
@@ -1000,7 +1011,7 @@ def plots():
 
     Button(plotswin, text='View Salesman vs Total Sales Graph', command=total_sales_vs_salesman).pack()
     Button(plotswin, text='View Salesman vs Total Sales Graph in Pie', command=pie_totalsales_vs_salesman).pack()
-    Button(plotswin, text='Pie test', command=payment_method_pie).pack()
+    Button(plotswin, text='Pie Payment Mode', command=payment_method_pie).pack()
 
 
 def manager_page():
@@ -1037,23 +1048,9 @@ def selection():
     b1.pack()
     b2.pack()
 
-
-'''with open('check.txt', 'a+') as f1:
-    k=f1.read()[0]
-    if int(k) ==1:
-        pass
-    else:
-        f1.seek(0)
-        createsalesidfile()
-        createuserfile()
-        f1.write('1')'''
-
-
 try:
     F=open('check.txt')
     F.close()
-
-
 except:
     createuserfile()
     createsalesidfile()
