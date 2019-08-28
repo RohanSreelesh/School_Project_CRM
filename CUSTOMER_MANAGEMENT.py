@@ -7,9 +7,27 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 import time
-from IPython import get_ipython
-get_ipython().run_line_magic('matplotlib', 'auto')
-mysql_password = ''
+import datetime
+
+
+def date_validation(day, month, year):
+    isValidDate = True
+    try:
+        datetime.datetime(int(year),
+                          int(month), int(day))
+    except ValueError:
+        isValidDate = False
+    if (isValidDate):
+        return True
+    else:
+        return False
+
+
+'''from IPython import get_ipython
+
+get_ipython().run_line_magic('matplotlib', 'auto')'''
+
+mysql_password = '1234'
 hostname = 'localhost'
 cust_ids_customer = []
 cust_ids_leads = []
@@ -76,7 +94,7 @@ for i in rows:
     cust_ids_leads.append(i[0])
 
 
-def delete_Check():
+def delete_check():
     return messagebox.askyesno('DELETE', 'DO YOU REALLY WANT TO DELETE')
 
 
@@ -99,7 +117,6 @@ def add():
     lblcust_id.place(x=10, y=50)
 
     rando_id = str(random.randint(0, 99999))
-    cust_ids_customer.append(rando_id)
 
     lblcust_id = Label(window, text=rando_id)
     lblcust_id.place(x=160, y=50)
@@ -125,7 +142,7 @@ def add():
     lblgender = Label(window, text="Select Customer Gender")
     lblgender.place(x=10, y=170)
 
-    combogender = cb(window, value=['Male', 'Female', 'Others'], width=10, height=10)
+    combogender = cb(window, value=['Male', 'Female'], width=10, height=10)
     combogender.set('Genders')
     combogender.place(x=160, y=170)
 
@@ -157,35 +174,37 @@ def add():
         address = entryaddress.get()
         mode = entrypayment_mode.get()
         value = entrypayment.get()
-        check=0
+        check = 0
         for i in value:
             if i in '1234567890':
-                check=True
+                check = True
             else:
-                check=False
+                check = False
                 break
-        if check==True:
-            if int(value) > 0 and entrypayment_mode!='' and gender!='Genders':
+        if check == True:
+            if int(value) > 0 and entrypayment_mode != '' and gender != 'Genders':
                 print(sales_id, cust_id, name, ph_no, email, gender, address, mode, value)
-                sql = "insert into customer values('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(sales_id,
-                                                                                                                 cust_id,
-                                                                                                                 name,
-                                                                                                                 ph_no,
-                                                                                                                 email,
-                                                                                                                 gender,
-                                                                                                                 address,
-                                                                                                                 mode,
-                                                                                                                 value)
-    
+                sql = "insert into customer values('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
+                    sales_id,
+                    cust_id,
+                    name,
+                    ph_no,
+                    email,
+                    gender,
+                    address,
+                    mode,
+                    value)
+
                 sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                                database='project', port=3306, auth_plugin='mysql_native_password')
-    
+
                 cursor = sql_connection.cursor()
                 cursor.execute(sql)
-    
+
                 sql_connection.commit()
-    
+
                 print(name, " Saved in DataBase")
+                cust_ids_customer.append(rando_id)
             else:
                 print("Sales cannot be negative. We don't give out loans")
         else:
@@ -373,11 +392,12 @@ def delete():
                                        database='project', port=3306, auth_plugin='mysql_native_password')
 
         cursor = sql_connection.cursor()
-        if delete_Check():
+        if delete_check():
             cursor.execute(sql)
             sql_connection.commit()
-            cust_ids_customer.remove(int(name))
             print(name, " Deleted from DataBase")
+            cust_ids_customer.remove(name)
+            print(cust_ids_customer)
         else:
             print(name, 'Record not deleted')
 
@@ -421,6 +441,22 @@ def view_all():
         print(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
 
 
+def my_cust():
+    sql = "select * from customer where sales_id='{}'".format(sales_id_user)
+
+    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                   database='project', port=3306, auth_plugin='mysql_native_password')
+
+    cursor = sql_connection.cursor()
+    cursor.execute(sql)
+    rows = cursor.fetchall()
+    if rows == []:
+        print('Sorry! You have no customers yet')
+    else:
+        for row in rows:
+            print(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
+
+
 def view_sales():
     root2 = Toplevel()
 
@@ -461,10 +497,12 @@ def customer_all():
     b4 = Button(win, text="View Customer", command=view, fg="green")
     b5 = Button(win, text="View All Customers", command=view_all, fg="blue")
     b6 = Button(win, text="View sales", command=view_sales, fg='IndianRed4')
+    b7 = Button(win, text='View Your Customer', command=my_cust, fg='Powder Blue')
     b1.pack()
     b2.pack()
     b3.pack()
     b4.pack()
+    b7.pack()
     b5.pack()
     b6.pack()
 
@@ -472,10 +510,8 @@ def customer_all():
 def login():
     global loginwindow, usernameentry, passwordentry, sales_id_user
     # this label notifies progress find a way so that it does not stack
-    user = usernameentry.get()
-
-    password = passwordentry.get()
-
+    user = usernameentry.get().replace(' ', '')
+    password = passwordentry.get().replace(' ', '')
     userlist = list(userdict.keys())
 
     if user == userlist[0]:
@@ -554,7 +590,7 @@ def login_front():
     Label(loginwindow, text="ENTER PASSWORD", font="Arial,12", bg="Yellow").pack()
 
     passwordentry = Entry(loginwindow)
-
+    passwordentry.config(show='*')
     passwordentry.pack()
 
     loginbutton = Button(loginwindow, text="LOGIN", command=login, fg="blue")
@@ -579,7 +615,7 @@ def selection_leads():
 
 
 def add_leads():
-    global cust_ids_leads
+    global cust_ids_leads, cust_id_lead
     window = Toplevel()
     window.geometry('300x330')
     window.configure(bg='pink')
@@ -587,7 +623,6 @@ def add_leads():
     lb_title.pack()
 
     cust_id_lead = str(random.randint(0, 99999))
-    cust_ids_leads.append(cust_id_lead)
 
     lblcustidname = Label(window, text='Customer ID')
     lblcustidname.place(x=10, y=20)
@@ -627,61 +662,25 @@ def add_leads():
         category = combo_custtype.get()
         phone = entry_lblph_no.get()
         meet = entry_lbl_meet.get()
-        date_check=0
-        for i in meet:
-            if i in '1234567890':
-                date_check=True
+        if date_validation(int(meet[0:2]), int(meet[2:4]), int(meet[4:])) and category != 'Select':
+            if time.strptime(meet, "%d%m%Y") > time.strptime(date_today, "%d%m%Y"):
+                sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone,
+                                                                                     meet)
+
+                sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                               database='project', port=3306, auth_plugin='mysql_native_password')
+
+                cursor = sql_connection.cursor()
+
+                cursor.execute(sql)
+
+                sql_connection.commit()
+
+                print(name, " Saved in DataBase")
             else:
-                date_check=False
-                break
-        if date_check==True and category!='select':
-            if (int(meet[0:2])==31 and (int(meet[2:4]) in [1,3,5,7,8,10,11,12])) or (int(meet[0:2])<31 and ((int(meet[2:4]) in [1,3,4,5,6,7,8,9,10,11,12]))) or (int(meet[0:2])==29 and int(meet[2:4])==2 and int(meet[4:])%4==0) or (int(meet[0:2])<29 and int(meet[2:4])==2) :
-                if (int(meet[2:4]) > int(date_today[2:4]) and int(meet[4:]) == int(date_today[4:])) and category!='Select':
-                    print(cust_id, name, category, phone, meet)
-                    sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
-        
-                    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
-                                                   database='project', port=3306, auth_plugin='mysql_native_password')
-        
-                    cursor = sql_connection.cursor()
-                    cursor.execute(sql)
-        
-                    sql_connection.commit()
-        
-                    print(name, " Saved in DataBase")
-                elif (int(meet[4:]) > int(date_today[4:])) and category!='Select':
-                    print(cust_id, name, category, phone, meet)
-                    sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
-        
-                    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
-                                                   database='project', port=3306, auth_plugin='mysql_native_password')
-        
-                    cursor = sql_connection.cursor()
-                    cursor.execute(sql)
-        
-                    sql_connection.commit()
-        
-                    print(name, " Saved in DataBase")
-                elif ((int(meet[2:4]) == int(date_today[2:4] and int(meet[4:]) == int(date_today[4:]))) and int(meet[0:2]) > int(
-                        date_today[0:2])) and category!='Select':
-                    print(cust_id, name, category, phone, meet)
-                    sql = "insert into leads values('{}','{}', '{}', '{}', '{}')".format(cust_id, name, category, phone, meet)
-        
-                    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
-                                                   database='project', port=3306, auth_plugin='mysql_native_password')
-        
-                    cursor = sql_connection.cursor()
-                    cursor.execute(sql)
-        
-                    sql_connection.commit()
-        
-                    print(name, " Saved in DataBase")
-                else:
-                    print('Please enter a future date')
-            else:
-                print('Please check the date and enter a valid date')
+                print('Please enter a future date')
         else:
-            print('Date can only contain integers')
+            print('Please enter Valid date')
 
     Button(window, text="Save", command=Save).pack(side=BOTTOM)
 
@@ -697,15 +696,17 @@ def delete_leads():
 
     def DeleteIt_leads():
         name = entryname.get()
-
+        print(cust_ids_leads)
+        print(name)
         sql = "delete from leads where cust_id = '{}'".format(name)
         sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                        database='project', port=3306, auth_plugin='mysql_native_password')
         cursor = sql_connection.cursor()
-        if delete_Check():
+        if delete_check():
             cursor.execute(sql)
             sql_connection.commit()
             print(name, 'Deleted from database')
+            cust_ids_leads.remove(name)
         else:
             print(name, 'Record not deleted')
 
@@ -717,10 +718,6 @@ def view_leads():
     combo = cb(root2, values=cust_ids_leads, width=15, height=20)
     combo.set('Select customer ID')
     combo.pack()
-
-    entryname = combo.get()
-
-    # entryname.pack()
 
     def ShowIt():
         name = combo.get()
@@ -771,7 +768,7 @@ def add_salesman():
         sales_ids_dict = p.load(f2)
         userdict = p.load(f)
         sales_id_count = list(sales_ids_dict.values())[-1]
-        f3 = open('sales_id_latest','w+')
+        f3 = open('sales_id_latest', 'w+')
         if key in userdict.keys():
             print('Employee already exists')
         else:
@@ -918,36 +915,38 @@ def fire_salesman():
 
     Button(update3, text='Fire!!!', command=process, bg='black', fg='red').pack()
 
+
 def plots():
     plotswin = Toplevel()
     plotswin.geometry('300x300')
     plotswin.configure(bg='burlywood1')
+    total_sales_list = []
+    total_sales_list_final = []
+    id_list_final = []
+    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                   database='project', port=3306, auth_plugin='mysql_native_password')
+    cursor = sql_connection.cursor()
+
+    cursor.execute('select sales_id from customer')
+    id_list = [x[0] for x in cursor.fetchall()]
+    for i in id_list:
+        if i not in id_list_final:
+            id_list_final.append(i)
+    id_list_final = list(map(int, id_list_final))
+    print(id_list_final)
+    for i in id_list:
+        cursor.execute("select value from customer where sales_id='{}'".format(i))
+        rows = cursor.fetchall()
+        sales_list = [x[0] for x in rows]
+        sales_list = list(map(int, sales_list))
+        total_sales_list.append(sum(sales_list))
+    for i in total_sales_list:
+        if i not in total_sales_list_final:
+            total_sales_list_final.append(i)
+    print(total_sales_list_final)
 
     def total_sales_vs_salesman():
-        global id_list_final, total_sales_list_final
-        total_sales_list = []
 
-        sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
-                                       database='project', port=3306, auth_plugin='mysql_native_password')
-        cursor = sql_connection.cursor()
-
-        cursor.execute('select sales_id from customer')
-        id_list = [x[0] for x in cursor.fetchall()]
-        for i in id_list:
-            if i not in id_list_final:
-                id_list_final.append(i)
-        id_list_final = list(map(int, id_list_final))
-
-        for i in id_list:
-            cursor.execute("select value from customer where sales_id='{}'".format(i))
-            rows = cursor.fetchall()
-            sales_list = [x[0] for x in rows]
-            sales_list = list(map(int, sales_list))
-            total = sum(sales_list)
-            total_sales_list.append(total)
-        for i in total_sales_list:
-            if i not in total_sales_list_final:
-                total_sales_list_final.append(i)
         plt.figure()
         plt.bar(np.arange(len(id_list_final)), total_sales_list_final, align='center', alpha=0.5)
         plt.xticks(np.arange(len(id_list_final)), id_list_final)
@@ -1043,13 +1042,14 @@ def selection():
     b1.pack()
     b2.pack()
 
+
 try:
-    F=open('check.txt')
+    F = open('check.txt')
     F.close()
 except:
     createuserfile()
     createsalesidfile()
-    F=open('check.txt','w')
+    F = open('check.txt', 'w')
     F.write('1')
     F.close()
 import_salesids()
