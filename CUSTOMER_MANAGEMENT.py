@@ -8,7 +8,7 @@ import numpy as np
 import random
 import time
 import datetime
-
+from IPython import get_ipython
 
 def date_validation(day, month, year):
     isValidDate = True
@@ -23,11 +23,24 @@ def date_validation(day, month, year):
         return False
 
 
-'''from IPython import get_ipython
+def phone_nocheck(phone_no):
+    phno = str(phone_no)
+    if len(phno) != 10:
+        print('incorrect no of digits')
+        return False
 
-get_ipython().run_line_magic('matplotlib', 'auto')'''
+    for i in phno:
+        if i not in '1234567890':
+            print('please enter only numbers')
+            return False
+    if phno.isdigit():
+        return True
+#use as per requirement
 
-mysql_password = '1234'
+
+get_ipython().run_line_magic('matplotlib', 'auto')
+
+mysql_password = ''
 hostname = 'localhost'
 cust_ids_customer = []
 cust_ids_leads = []
@@ -509,7 +522,7 @@ def customer_all():
 
 def login():
     global loginwindow, usernameentry, passwordentry, sales_id_user
-    # this label notifies progress find a way so that it does not stack
+    # used error boxes
     user = usernameentry.get().replace(' ', '')
     password = passwordentry.get().replace(' ', '')
     userlist = list(userdict.keys())
@@ -526,7 +539,7 @@ def login():
 
         else:
 
-            Label(loginwindow, text="wrong password", font="Arial,12", bg="Yellow").pack()
+            messagebox.showinfo("login failed", "incorrect password")
 
     elif user in userlist:
 
@@ -539,15 +552,15 @@ def login():
             selection()
         else:
 
-            Label(loginwindow, text="wrong password", font="Arial,12", bg="Yellow").pack()
+            messagebox.showinfo("login failed", "incorrect password")
     else:
 
-        Label(loginwindow, text="wrong username", font="Arial,12", bg="Yellow").pack()
+        messagebox.showinfo("login failed", "incorrect username")
 
 
 def welcome_page():
     global welcome
-    text1 = '''Welcome to customer relations management 
+    text1 = '''Welcome to customer relations management
 
     please enter your designated username and password
 
@@ -850,9 +863,12 @@ def update_salesman():
                 if entrynew.get() in list(userdict.keys()):
                     print('This user already exists')
                 else:
+                    id_sales = sales_ids_dict[old]
                     password = userdict[old]
                     del userdict[old]
+                    del sales_ids_dict[old]
                     userdict[entrynew.get()] = password
+                    sales_ids_dict[entrynew.get()] = id_sales
                     f.seek(0)
                     p.dump(userdict, f)
                     f.close()
@@ -877,6 +893,7 @@ def update_salesman():
                 userdict[old] = entrynew.get()
                 f.seek(0)
                 p.dump(userdict, f)
+                f.flush()
                 f.close()
                 print('success')
                 print(userdict)
@@ -897,6 +914,9 @@ def fire_salesman():
     lblold.pack()
     entryold = Entry(update3)
     entryold.pack()
+    f=open('users','rb')
+    userdict=p.load(f)
+    f.close()
 
     def process():
         if entryold.get() in list(userdict.keys()):
@@ -907,9 +927,18 @@ def fire_salesman():
                 print('Employee fired successfully!. Nice job!')
                 print(userdict)
                 f = open('users', 'wb+')
+
+
                 p.dump(userdict, f)
                 f.flush()
                 f.close()
+                
+                f1 = open('salesids1', 'rb+') #this is to update sales number dict technically update nahi hona chahiye as even if employee is fired uske purane sales registered rehne chahiye
+                sales_ids_dict = p.load(f1)
+                del sales_ids_dict[entryold.get()]
+                f1.seek(0)
+                p.dump(sales_ids_dict, f1)
+                f1.close()
         else:
             print('Employee doesnt exist')
 
@@ -1007,6 +1036,13 @@ def plots():
     Button(plotswin, text='View Salesman vs Total Sales Graph in Pie', command=pie_totalsales_vs_salesman).pack()
     Button(plotswin, text='Pie Payment Mode', command=payment_method_pie).pack()
 
+def see_salesmen():
+    f = open('users', 'rb+')
+    f.seek(0)
+    userdict = p.load(f)
+    f.flush()
+    f.close()
+    print(userdict)
 
 def manager_page():
     win = Tk()
@@ -1021,6 +1057,7 @@ def manager_page():
     b5 = Button(win, text="View All Customers", command=view_all, fg="blue")
     b6 = Button(win, text="View sales", command=view_sales_manager, fg='IndianRed4')
     b7 = Button(win, text='Map Graphs', command=plots, fg='Powder Blue')
+    b8 = Button(win, text='View Salesmen', command=see_salesmen, fg='yellow')
     b1.pack()
     b2.pack()
     b3.pack()
@@ -1028,6 +1065,7 @@ def manager_page():
     b5.pack()
     b6.pack()
     b7.pack()
+    b8.pack()
 
 
 # both are same as customer only small changes
