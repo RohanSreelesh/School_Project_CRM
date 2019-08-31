@@ -10,6 +10,7 @@ import time
 import datetime
 from IPython import get_ipython
 
+
 def date_validation(day, month, year):
     isValidDate = True
     try:
@@ -35,12 +36,14 @@ def phone_nocheck(phone_no):
             return False
     if phno.isdigit():
         return True
-#use as per requirement
 
 
-get_ipython().run_line_magic('matplotlib', 'auto')
+# use as per requirement
 
-mysql_password = ''
+
+#get_ipython().run_line_magic('matplotlib', 'auto')
+
+mysql_password = 'Rohan2002'
 hostname = 'localhost'
 cust_ids_customer = []
 cust_ids_leads = []
@@ -690,6 +693,7 @@ def add_leads():
                 sql_connection.commit()
 
                 print(name, " Saved in DataBase")
+                cust_ids_leads.append(cust_id)
             else:
                 print('Please enter a future date')
         else:
@@ -914,8 +918,8 @@ def fire_salesman():
     lblold.pack()
     entryold = Entry(update3)
     entryold.pack()
-    f=open('users','rb')
-    userdict=p.load(f)
+    f = open('users', 'rb')
+    userdict = p.load(f)
     f.close()
 
     def process():
@@ -928,12 +932,12 @@ def fire_salesman():
                 print(userdict)
                 f = open('users', 'wb+')
 
-
                 p.dump(userdict, f)
                 f.flush()
                 f.close()
-                
-                f1 = open('salesids1', 'rb+') #this is to update sales number dict technically update nahi hona chahiye as even if employee is fired uske purane sales registered rehne chahiye
+
+                f1 = open('salesids1',
+                          'rb+')  # this is to update sales number dict technically update nahi hona chahiye as even if employee is fired uske purane sales registered rehne chahiye
                 sales_ids_dict = p.load(f1)
                 del sales_ids_dict[entryold.get()]
                 f1.seek(0)
@@ -1036,6 +1040,7 @@ def plots():
     Button(plotswin, text='View Salesman vs Total Sales Graph in Pie', command=pie_totalsales_vs_salesman).pack()
     Button(plotswin, text='Pie Payment Mode', command=payment_method_pie).pack()
 
+
 def see_salesmen():
     f = open('users', 'rb+')
     f.seek(0)
@@ -1043,6 +1048,7 @@ def see_salesmen():
     f.flush()
     f.close()
     print(userdict)
+
 
 def manager_page():
     win = Tk()
