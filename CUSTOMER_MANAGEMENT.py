@@ -8,7 +8,9 @@ import numpy as np
 import random
 import time
 import datetime
-from IPython import get_ipython
+
+
+# from IPython import get_ipython
 
 
 def date_validation(day, month, year):
@@ -22,7 +24,6 @@ def date_validation(day, month, year):
         return True
     else:
         return False
-
 
 def phone_nocheck(phone_no):
     phno = str(phone_no)
@@ -41,9 +42,9 @@ def phone_nocheck(phone_no):
 # use as per requirement
 
 
-#get_ipython().run_line_magic('matplotlib', 'auto')
+# get_ipython().run_line_magic('matplotlib', 'auto')
 
-mysql_password = 'Rohan2002'
+mysql_password = '1234'
 hostname = 'localhost'
 cust_ids_customer = []
 cust_ids_leads = []
@@ -850,6 +851,10 @@ def update_salesman():
     entryold.pack()
     f = open('users', 'rb+')
     userdict = p.load(f)
+    f.close()
+    f2 = open('salesids1', 'rb+')
+    sales_ids_dict = p.load(f2)
+    f2.close()
 
     def update_user():
         global process
@@ -864,19 +869,62 @@ def update_salesman():
             entrynew.pack()
 
             def process():
+                key_list = []
+                value_list = []
                 if entrynew.get() in list(userdict.keys()):
                     print('This user already exists')
                 else:
-                    id_sales = sales_ids_dict[old]
-                    password = userdict[old]
-                    del userdict[old]
-                    del sales_ids_dict[old]
-                    userdict[entrynew.get()] = password
-                    sales_ids_dict[entrynew.get()] = id_sales
-                    f.seek(0)
-                    p.dump(userdict, f)
-                    f.close()
-                    print(userdict)
+                    if entryold.get() == list(userdict.keys())[0]:
+                        print('changing admin')
+                        id_sales = sales_ids_dict[old]
+                        password = userdict[old]
+                        del userdict[old]
+                        del sales_ids_dict[old]
+                        userdict[entrynew.get()] = password
+                        for key, value in userdict.items():
+                            key_list.append(key)
+                            value_list.append(value)
+                        userdict.clear()
+                        dict3 = dict(zip(key_list[::-1], value_list[::-1]))
+                        sales_ids_dict[entrynew.get()] = id_sales
+                        key_list.clear()
+                        value_list.clear()
+                        for key, value in sales_ids_dict.items():
+                            key_list.append(key)
+                            value_list.append(value)
+                        sales_ids_dict.clear()
+                        dict4 = dict(zip(key_list[::-1], value_list[::-1]))
+                        f = open('users', 'wb+')
+                        f.truncate()
+                        f.seek(0)
+                        p.dump(dict3, f)
+                        f.close()
+                        f2 = open('salesids1', 'wb+')
+                        f2.truncate()
+                        f2.seek(0)
+                        p.dump(dict4, f2)
+                        f2.close()
+                        print(dict4)
+                        print(dict3)
+                    else:
+                        id_sales = sales_ids_dict[old]
+                        password = userdict[old]
+                        del userdict[old]
+                        del sales_ids_dict[old]
+                        userdict[entrynew.get()] = password
+                        sales_ids_dict[entrynew.get()] = id_sales
+                        f = open('users', 'wb+')
+                        f.truncate()
+                        f.seek(0)
+                        p.dump(userdict, f)
+                        f.close()
+                        f2 = open('salesids1', 'wb+')
+                        f2.truncate()
+                        f2.seek(0)
+                        p.dump(sales_ids_dict, f2)
+                        f2.close()
+                        print(userdict)
+                        print(sales_ids_dict)
         else:
             print('username does not exist')
         Button(update1, text='done', command=process).pack()
@@ -937,7 +985,8 @@ def fire_salesman():
                 f.close()
 
                 f1 = open('salesids1',
-                          'rb+')  # this is to update sales number dict technically update nahi hona chahiye as even if employee is fired uske purane sales registered rehne chahiye
+                          'rb+')  # this is to update sales number dict technically update nahi hona chahiye as even
+                # if employee is fired uske purane sales registered rehne chahiye
                 sales_ids_dict = p.load(f1)
                 del sales_ids_dict[entryold.get()]
                 f1.seek(0)
