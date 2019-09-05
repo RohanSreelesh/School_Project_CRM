@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
-from tkinter.ttk import Combobox as cb
+from tkinter.ttk import Combobox as Combo
 import mysql.connector as mysql
 import pickle as p
 import matplotlib.pyplot as plt
@@ -157,7 +157,7 @@ def add():
     lblgender = Label(window, text="Select Customer Gender")
     lblgender.place(x=10, y=170)
 
-    combogender = cb(window, value=['Male', 'Female'], width=10, height=10)
+    combogender = Combo(window, value=['Male', 'Female'], width=10, height=10)
     combogender.set('Genders')
     combogender.place(x=160, y=170)
 
@@ -170,7 +170,7 @@ def add():
     lblpayment_mode = Label(window, text="Select Payment mode")
     lblpayment_mode.place(x=10, y=230)
 
-    entrypayment_mode = cb(window, value=['Cash', 'Card', 'Others'], width=10, height=10)
+    entrypayment_mode = Combo(window, value=['Cash', 'Card', 'Others'], width=10, height=10)
     entrypayment_mode.place(x=160, y=230)
 
     lblpayment = Label(window, text='Enter value')
@@ -455,7 +455,7 @@ def view():
     lblname = Label(root2, text="Select Customer ID")
     lblname.pack()
 
-    entryname = cb(root2, value=cust_ids_customer, width=10, height=10)
+    entryname = Combo(root2, value=cust_ids_customer, width=10, height=10)
     entryname.set('Choose Id')
     entryname.pack()
 
@@ -471,7 +471,8 @@ def view():
 
         cursor.execute(sql)
 
-        for row in cursor.fetchall():
+        rows1 = cursor.fetchall()
+        for row in rows1:
             print("Sales ID:", row[0], "Customer ID:", row[1], "Customer Name:", row[2], "Phone Number:", row[3]
                   , "Email:", row[4],
                   "Gender:", row[5], "Address:", row[6], "Payment Mode:", row[7], "Sale:", row[8])
@@ -489,7 +490,8 @@ def view_all():
 
     cursor.execute(sql)
 
-    for row in cursor.fetchall():
+    rows2 = cursor.fetchall()
+    for row in rows2:
         print("Sales ID:", row[0], "Customer ID:", row[1], "Customer Name:", row[2], "Phone Number:", row[3]
               , "Email:", row[4],
               "Gender:", row[5], "Address:", row[6], "Payment Mode:", row[7], "Sale:", row[8])
@@ -505,13 +507,15 @@ def my_cust():
 
     cursor.execute(sql)
 
-    if cursor.fetchall() == []:
+    rows3 = cursor.fetchall()
+
+    if rows3 == []:
 
         print('Sorry! You have no customers yet')
 
     else:
 
-        for row in cursor.fetchall():
+        for row in rows3:
             print("Sales ID:", row[0], "Customer ID:", row[1], "Customer Name:", row[2], "Phone Number:", row[3]
                   , "Email:", row[4],
                   "Gender:", row[5], "Address:", row[6], "Payment Mode:", row[7], "Sale:", row[8])
@@ -538,7 +542,8 @@ def view_sales():
 
         cursor.execute(sql)
 
-        sales_list = list(map(int, [x[0] for x in cursor.fetchall()]))
+        rows4 = cursor.fetchall()
+        sales_list = list(map(int, [x[0] for x in rows4]))
         print(sales_list)
 
         total = sum(sales_list)
@@ -627,7 +632,7 @@ def welcome_page():
 
     for a manager: add,update and fire salesmen also analyse data '''
 
-    welcome = Tk()
+    welcome = Tk(className='Welcome To CRM')
 
     lbl = Label(welcome, text=text1)
     lbl.pack()
@@ -643,7 +648,7 @@ def login_front():
 
     global loginwindow, usernameentry, passwordentry
 
-    loginwindow = Tk()
+    loginwindow = Tk(className='LOGIN')
 
     loginwindow.geometry("300x170")
 
@@ -680,11 +685,13 @@ def selection_leads():
     b3 = Button(win, text="Delete Leads", command=delete_leads, fg="orange")
     b4 = Button(win, text="View Lead", command=view_leads, fg="green")
     b5 = Button(win, text="View All Leads", command=view_all_leads, fg="blue")
+    b2 = Button(win, text="convert to order", command=convert_leads_to_orders, fg="blue")
 
     b1.pack()
     b3.pack()
     b4.pack()
     b5.pack()
+    b2.pack()
 
 
 def add_leads():
@@ -714,7 +721,7 @@ def add_leads():
     lblcategory = Label(window, text="Customer Type")
     lblcategory.place(x=10, y=80)
 
-    combo_custtype = cb(window, values=['New', 'Repeating'], width=10, height=10)
+    combo_custtype = Combo(window, values=['New', 'Repeating'], width=10, height=10)
     combo_custtype.set('Select')
     combo_custtype.place(x=160, y=80)
 
@@ -806,7 +813,7 @@ def delete_leads():
 def view_leads():
     root2 = Toplevel()
 
-    combo = cb(root2, values=cust_ids_leads, width=15, height=20)
+    combo = Combo(root2, values=cust_ids_leads, width=15, height=20)
     combo.set('Select customer ID')
     combo.pack()
 
@@ -821,7 +828,8 @@ def view_leads():
         cursor = sql_connection.cursor()
         cursor.execute(sql)
 
-        for row in cursor.fetchall():
+        rows5 = cursor.fetchall()
+        for row in rows5:
             print("Customer ID:", row[0], "Customer Name:", row[1], "Customer Type:", row[2], "Phone number:", row[3]
                   , "Next Meeting:", row[4])
 
@@ -837,7 +845,8 @@ def view_all_leads():
     cursor = sql_connection.cursor()
     cursor.execute(sql)
 
-    for row in cursor.fetchall():
+    rows6 = cursor.fetchall()
+    for row in rows6:
         print("Customer ID:", row[0], "Customer Name:", row[1], "Customer Type:", row[2], "Phone number:", row[3]
               , "Next Meeting:", row[4])
 
@@ -920,7 +929,8 @@ def view_sales_manager():
         cursor = sql_connection.cursor()
         cursor.execute(sql)
 
-        total = sum(list(map(int, [x[0] for x in cursor.fetchall()])))
+        rows7 = cursor.fetchall()
+        total = sum(list(map(int, [x[0] for x in rows7])))
         print('Gross Sales:', total)
 
     Button(win, text="Show", command=ShowIt).pack(side=BOTTOM)
@@ -1134,6 +1144,185 @@ def fire_salesman():
     Button(update3, text='Fire!!!', command=process, bg='black', fg='red').pack()
 
 
+def convert_leads_to_orders():
+    root2 = Toplevel()
+
+    combo = Combo(root2, values=cust_ids_leads, width=15, height=20)
+    combo.set('Select customer ID')
+    combo.pack()
+
+    def conversion():
+        global phone_no, cust_id_lead
+        name = combo.get()
+        print(name)
+
+        sql = "select * from leads where cust_id = '{}'".format(name)
+
+        sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+
+                                       database='project', port=3306, auth_plugin='mysql_native_password')
+
+        cursor = sql_connection.cursor()
+
+        cursor.execute(sql)
+
+        rows8 = cursor.fetchall()
+        for row in rows8:
+            cust_id_lead = row[0]
+            name = row[1]
+            phone_no = row[3]
+
+            print("Customer ID:", row[0], "Customer Name:", row[1], "Customer Type:", row[2], "Phone number:", row[3]
+                  , "Next Meeting:", row[4])
+
+        window = Toplevel()
+        window.geometry('300x330')
+        window.configure(bg='pink')
+
+        lb_title = Label(window, text='Covert Leads To Orders', font="Arial,10", bg="Yellow")
+        lb_title.pack()
+
+        lblsales_id = Label(window, text='Unique salesman id')
+        lblsales_id.place(x=10, y=20)
+
+        lblsales_id = Label(window, text=sales_id_user)
+        lblsales_id.place(x=160, y=20)
+
+        lblcustidname = Label(window, text='Customer ID')
+        lblcustidname.place(x=10, y=50)
+
+        lblcustid = Label(window, text=cust_id_lead)
+        lblcustid.place(x=160, y=50)
+
+        lbname = Label(window, text='Name')
+        lbname.place(x=10, y=80)
+
+        entry_lbname = Label(window, text=name)
+        entry_lbname.place(x=160, y=80)
+
+        lblph_no = Label(window, text="Phone number")
+        lblph_no.place(x=10, y=110)
+
+        entry_lblph_no = Label(window, text=phone_no)
+        entry_lblph_no.place(x=160, y=110)
+
+        lblemail = Label(window, text="Enter Customer Email")
+        lblemail.place(x=10, y=140)
+
+        entryemail = Entry(window)
+        entryemail.place(x=160, y=140)
+
+        lblgender = Label(window, text="Select Customer Gender")
+        lblgender.place(x=10, y=170)
+
+        combogender = Combo(window, value=['Male', 'Female'], width=10, height=10)
+        combogender.set('Genders')
+        combogender.place(x=160, y=170)
+
+        lbladdress = Label(window, text="Enter Customer Address")
+        lbladdress.place(x=10, y=200)
+
+        entryaddress = Entry(window)
+        entryaddress.place(x=160, y=200)
+
+        lblpayment_mode = Label(window, text="Select Payment mode")
+        lblpayment_mode.place(x=10, y=230)
+
+        entrypayment_mode = Combo(window, value=['Cash', 'Card', 'Others'], width=10, height=10)
+        entrypayment_mode.place(x=160, y=230)
+
+        lblpayment = Label(window, text='Enter value')
+        lblpayment.place(x=10, y=260)
+
+        entrypayment = Entry(window)
+        entrypayment.place(x=160, y=260)
+
+        def Save():  # for orders
+
+            sales_id = sales_id_user
+
+            cust_id = cust_id_lead
+
+            name1 = name
+
+            ph_no = phone_no
+
+            email = entryemail.get()
+
+            gender = combogender.get()
+
+            address = entryaddress.get()
+
+            mode = entrypayment_mode.get()
+
+            value = entrypayment.get()
+
+            check = 0
+
+            for i in value:
+
+                if i in '1234567890':
+
+                    check = True
+
+                else:
+
+                    check = False
+
+                    break
+
+            if check == True:
+
+                if int(value) > 0 and entrypayment_mode != '' and gender != 'Genders':
+                    print(sales_id, cust_id, name1, ph_no, email, gender, address, mode, value)
+
+                    sql = "insert into customer values('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
+                        sales_id,
+                        cust_id,
+                        name1,
+                        ph_no,
+                        email,
+                        gender,
+                        address,
+                        mode,
+                        value)
+
+                    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                                   database='project', port=3306, auth_plugin='mysql_native_password')
+
+                    cursor = sql_connection.cursor()
+
+                    cursor.execute(sql)
+
+                    sql_connection.commit()
+
+                    sql1 = "delete from leads where cust_id = '{}'".format(cust_id)
+
+                    cursor = sql_connection.cursor()
+
+                    cursor.execute(sql1)
+
+                    sql_connection.commit()
+
+                    print(name, " Saved in DataBase", 'deleted from leads')
+
+                    cust_ids_customer.append(cust_id)
+
+                else:
+
+                    print("Sales cannot be negative. We don't give out loans")
+
+            else:
+
+                print('Sales can only be integers')
+
+        Button(window, text="Save", command=Save).pack(side=BOTTOM)
+
+        window.mainloop()
+
+    Button(root2, text="Convert", command=conversion).pack(side=BOTTOM)
+
+
 def plots():
     plotswin = Toplevel()
     plotswin.geometry('300x300')
@@ -1145,18 +1334,23 @@ def plots():
 
     sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                    database='project', port=3306, auth_plugin='mysql_native_password')
+
     cursor = sql_connection.cursor()
 
     cursor.execute('select sales_id from customer')
 
-    for i in [x[0] for x in cursor.fetchall()]:
+    id_list = [x[0] for x in cursor.fetchall()]
+    for i in id_list:
         if i not in id_list_final:
             id_list_final.append(i)
     id_list_final = list(map(int, id_list_final))
 
-    for i in [x[0] for x in cursor.fetchall()]:
+    for i in id_list:
         cursor.execute("select value from customer where sales_id='{}'".format(i))
-        total_sales_list.append(sum(list(map(int, [x[0] for x in cursor.fetchall()]))))
+        rows = cursor.fetchall()
+        sales_list = [x[0] for x in rows]
+        sales_list = list(map(int, sales_list))
+        total_sales_list.append(sum(sales_list))
 
     for i in total_sales_list:
         if i not in total_sales_list_final:
@@ -1165,7 +1359,7 @@ def plots():
     def total_sales_vs_salesman():
 
         plt.figure()
-        plt.bar(np.arange(len(id_list_final)), total_sales_list_final)
+        plt.bar(np.arange(len(id_list_final)), total_sales_list_final, align='center', alpha=0.5)
         plt.xticks(np.arange(len(id_list_final)), id_list_final)
         plt.ylabel('Total Sale in Rupees')
         plt.xlabel('Sales ID of salesman')
@@ -1173,16 +1367,16 @@ def plots():
         plt.show()
 
     def pie_totalsales_vs_salesman():
+        labels = id_list_final
+        sizes = total_sales_list_final
+        colors = ['red', 'blue', 'green', 'yellow', 'orange', 'white']
         explode = []
-
         for i in total_sales_list_final:
             if i > 100000:
                 explode.append(0.2)
             else:
                 explode.append(0)
-
-        plt.pie(total_sales_list_final, explode=explode, labels=id_list_final,
-                colors=['red', 'blue', 'green', 'yellow', 'orange', 'white'],
+        plt.pie(sizes, explode=explode, labels=labels, colors=colors,
                 autopct='%03.1f%%', shadow=True, startangle=140)
         plt.axis('equal')
         plt.show()
@@ -1194,14 +1388,13 @@ def plots():
         colors = ['red', 'blue', 'green', 'yellow', 'orange', 'white']
         explode = []
         labels = ['cash', 'card', 'other']
-
         sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                        database='project', port=3306, auth_plugin='mysql_native_password')
         cursor = sql_connection.cursor()
 
         cursor.execute('select mode from customer')
-
-        for i in [x[0] for x in cursor.fetchall()]:
+        mode_list = [x[0] for x in cursor.fetchall()]
+        for i in mode_list:
             if i == 'Cash':
                 cash += 1
             elif i == 'Card':
@@ -1210,7 +1403,6 @@ def plots():
                 other += 1
 
         sizes = [cash, card, other]
-
         for i in range(0, len(sizes) - 1):
             if sizes[i] == 0:
                 sizes.pop(i)
@@ -1218,7 +1410,6 @@ def plots():
 
         for i in sizes:
             explode.append(0.0)
-
         plt.pie(sizes, explode=explode, labels=labels, colors=colors,
                 autopct='%03.1f%%', shadow=True, startangle=140)
         plt.show()
@@ -1226,6 +1417,8 @@ def plots():
     Button(plotswin, text='View Salesman vs Total Sales Graph', command=total_sales_vs_salesman).pack()
     Button(plotswin, text='View Salesman vs Total Sales Graph in Pie', command=pie_totalsales_vs_salesman).pack()
     Button(plotswin, text='Pie Payment Mode', command=payment_method_pie).pack()
+
+
 
 
 def see_salesmen():
@@ -1238,7 +1431,7 @@ def see_salesmen():
 
 
 def manager_page():
-    win = Tk()
+    win = Tk(className='Manager Window')
     win.geometry("400x400")
     win.configure(bg='bisque')
 
@@ -1252,7 +1445,7 @@ def manager_page():
     b5 = Button(win, text="View All Customers", command=view_all, fg="blue")
     b6 = Button(win, text="View sales", command=view_sales_manager, fg='IndianRed4')
     b7 = Button(win, text='Map Graphs', command=plots, fg='Powder Blue')
-    b8 = Button(win, text='View Salesmen', command=see_salesmen, fg='yellow')
+    b8 = Button(win, text='View Salesmen', command=see_salesmen, fg='Cyan')
 
     b1.pack()
     b2.pack()
@@ -1266,7 +1459,7 @@ def manager_page():
 
 # both are same as customer only small changes
 def selection():
-    win = Tk()
+    win = Tk(className='Selection')
     win.geometry("300x170")
     win.configure(bg='bisque')
 
@@ -1281,12 +1474,9 @@ def selection():
 
 
 try:
-
     F = open('check.txt')
     F.close()
-
 except:
-
     createuserfile()
     createsalesidfile()
 
