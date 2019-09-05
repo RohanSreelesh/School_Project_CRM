@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 from tkinter.ttk import Combobox as Combo
+
 import mysql.connector as mysql
 import pickle as p
 import matplotlib.pyplot as plt
@@ -21,7 +22,13 @@ id_list_final = []
 
 # use as per requirement
 # get_ipython().run_line_magic('matplotlib', 'auto')
+def get_key(val):
+    print(sales_ids_dict)
+    for key, value in sales_ids_dict.items():
+        if val == value:
+            return key
 
+    return "key doesn't exist"
 def date_validation(day, month, year):
     isValidDate = True
     try:
@@ -1419,7 +1426,61 @@ def plots():
     Button(plotswin, text='Pie Payment Mode', command=payment_method_pie).pack()
 
 
+def duplicates(lst, item):
+    """
 
+    :param lst:
+    :param item:
+    :return:
+    """
+    return [i for i, x in enumerate(lst) if x == item]
+
+
+def simple_analytics():
+    root=Tk()
+    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                   database='project', port=3306, auth_plugin='mysql_native_password')
+    cursor = sql_connection.cursor()
+
+    cursor.execute('select sales_id,value from customer')
+
+    rows = cursor.fetchall()
+    sales_ids_1 = []
+    sales = []
+    elements = []
+    dictx = {}
+    for i in rows:
+        sales_ids_1.append(i[0])
+        sales.append(i[1])
+    sales_ids_1 = list(map(int, sales_ids_1))
+    sales = list(map(int, sales))
+    '''final_dict = dict((x, duplicates(sales_ids_1, x)) for x in set(sales_ids_1) if sales_ids_1.count(x) > 1)
+    print(final_dict)'''
+    for elem in sales_ids_1:
+        counter = 0
+        elem_pos = []
+        for i in sales_ids_1:
+            if i == elem:
+                elem_pos.append(counter)
+            counter = counter + 1
+        elements.append([elem, elem_pos])
+    res = []
+    for i in elements:
+        if i not in res:
+            res.append(i)
+    for i in res:
+        t = i[0]
+        value_final = 0
+        for j in i[1]:
+            value_final += sales[j]
+        dictx[t] = value_final
+    print(dictx)
+    salesman_id = max(dictx, key=dictx.get)
+    print(salesman_id)
+    string2 = get_key(str(salesman_id))
+    message = "The salesman with maximum sales is:" + string2
+    print(message)
+    Label(root, text=message).pack()
 
 def see_salesmen():
     f = open('users', 'rb+')
@@ -1446,6 +1507,7 @@ def manager_page():
     b6 = Button(win, text="View sales", command=view_sales_manager, fg='IndianRed4')
     b7 = Button(win, text='Map Graphs', command=plots, fg='Powder Blue')
     b8 = Button(win, text='View Salesmen', command=see_salesmen, fg='Cyan')
+    b9 = Button(win, text='View Salesman with most sales', command=simple_analytics, fg='cornsilk3')
 
     b1.pack()
     b2.pack()
@@ -1455,6 +1517,7 @@ def manager_page():
     b6.pack()
     b7.pack()
     b8.pack()
+    b9.pack()
 
 
 # both are same as customer only small changes
