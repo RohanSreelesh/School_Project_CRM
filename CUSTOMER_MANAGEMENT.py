@@ -10,18 +10,16 @@ import random
 import time
 import datetime
 
-# from IPython import get_ipython
+from IPython import get_ipython
 
-mysql_password = '1234'
+mysql_password = ''
 hostname = 'localhost'
 cust_ids_customer = []
 cust_ids_leads = []
 total_sales_list_final = []
 id_list_final = []
 
-
-# use as per requirement
-# get_ipython().run_line_magic('matplotlib', 'auto')
+get_ipython().run_line_magic('matplotlib', 'auto')
 def get_key(val):
     print(sales_ids_dict)
     for key, value in sales_ids_dict.items():
@@ -252,6 +250,14 @@ def update():
     win1 = Toplevel()
     win1.geometry("330x300")
     win1.configure(bg='bisque')
+    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                           database='project', port=3306, auth_plugin='mysql_native_password')
+    sql='''select cust_id from customer;'''
+
+    cursor = sql_connection.cursor()
+
+    cursor.execute(sql)
+    cust_ids_customer=cursor.fetchall()
 
     def update_name():
         window1 = Toplevel()
@@ -270,8 +276,10 @@ def update():
         lblid = Label(window1, text="Enter Customer ID")
         lblid.pack()
 
-        entryid = Entry(window1)
+        entryid = Combo(window1, value=cust_ids_customer, width=10, height=10)
+        entryid.set('Choose Id')
         entryid.pack()
+        
 
         def update1():
             name = entryname.get()
@@ -309,14 +317,15 @@ def update():
         lblid = Label(window2, text="Enter Customer ID")
         lblid.pack()
 
-        entryid = Entry(window2)
+        entryid = Combo(window2, value=cust_ids_customer, width=10, height=10)
+        entryid.set('Choose Id')
         entryid.pack()
 
         def update2():
             ph_no = entryph_no.get()
             name = entryid.get()
 
-            sql = "update customer set ph_no='{}' where cust_id='{}'".format(ph_no, name)
+            sql = "update customer set phone_no='{}' where cust_id='{}'".format(ph_no, name)
 
             sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
                                            database='project', port=3306, auth_plugin='mysql_native_password')
@@ -348,7 +357,8 @@ def update():
         id = Label(window3, text="Enter Customer ID")
         id.pack()
 
-        entryid = Entry(window3)
+        entryid = Combo(window3, value=cust_ids_customer, width=10, height=10)
+        entryid.set('Choose Id')
         entryid.pack()
 
         def update3():
@@ -387,7 +397,8 @@ def update():
         lblid = Label(window4, text="Enter Customer ID")
         lblid.pack()
 
-        entryid = Entry(window4)
+        entryid = Combo(window4, value=cust_ids_customer, width=10, height=10)
+        entryid.set('Choose Id')
         entryid.pack()
 
         def update4():
@@ -425,8 +436,17 @@ def delete():
 
     lblname = Label(root, text="Enter Customer  ID")
     lblname.pack()
+    sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                                           database='project', port=3306, auth_plugin='mysql_native_password')
+    sql='''select cust_id from customer;'''
 
-    entryname = Entry(root)
+    cursor = sql_connection.cursor()
+
+    cursor.execute(sql)
+    cust_ids_customer=cursor.fetchall()
+
+    entryname = Combo(root, value=cust_ids_customer, width=10, height=10)
+    entryname.set('Choose Id')
     entryname.pack()
 
     def DeleteIt():
@@ -447,7 +467,6 @@ def delete():
 
             print(name, " Deleted from DataBase")
 
-            cust_ids_customer.remove(name)
 
         else:
 
