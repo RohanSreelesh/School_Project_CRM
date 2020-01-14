@@ -11,7 +11,7 @@ import datetime
 
 # from IPython import get_ipython
 
-mysql_password = '1'
+mysql_password = ''
 hostname = 'localhost'
 cust_ids_customer = []
 cust_ids_leads = []
