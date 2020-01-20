@@ -11,7 +11,7 @@ import datetime
 
 # from IPython import get_ipython
 
-mysql_password = ''
+mysql_password = 'Rohan2002'
 hostname = 'localhost'
 cust_ids_customer = []
 cust_ids_leads = []
@@ -56,7 +56,7 @@ def phone_nocheck(phone_no):
     if phno.isdigit():
         return True
 
-
+#1 this creates main file with admin logins and salesman logins
 def createuserfile():
     userdict = {'admin': '1234', 'avig': '1234', 'rohan': '1234', 'rishabh': '1234'}
     f = open('users', 'wb+')
@@ -64,7 +64,7 @@ def createuserfile():
     f.flush()
     f.close()
 
-
+#2Creates sales id for the salesmen
 def createsalesidfile():
     sales_ids = {'admin': 'Null', 'avig': '2', 'rohan': '1', 'rishabh': '3'}
     f = open('salesids1', 'wb+')
@@ -72,14 +72,14 @@ def createsalesidfile():
     f.flush()
     f.close()
 
-
+#imports the dictionary with salesmen and admin logins
 def import_userdict():
     global userdict
     f = open('users', 'rb+')
     userdict = p.load(f)
     f.close()
 
-
+#imports salesid dictionary
 def import_salesids():
     global sales_ids_dict
     f = open('salesids1', 'rb+')
@@ -87,34 +87,6 @@ def import_salesids():
     f.close()
 
 
-sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
-                               port=3306, auth_plugin='mysql_native_password')
-
-cursor_main = sql_connection.cursor()
-
-cursor_main.execute('create database if not exists project')
-
-cursor_main.execute('use project;')
-
-cursor_main.execute(
-    'create table if not exists customer (sales_id varchar(10),cust_id varchar(10) unique,name varchar(100) '
-    ',phone_no varchar(10),email varchar(100),gender varchar(6),address varchar(500),mode varchar('
-    '10),value varchar(10));')
-
-cursor_main.execute(
-    'create table if not exists leads (cust_id varchar(30) unique,name varchar(50),cust_type varchar(50),'
-    'phone_no varchar(10) , '
-    'next_meeting varchar(30));')
-
-cursor_main.execute('select cust_id from customer;')
-rows = cursor_main.fetchall()
-for i in rows:
-    cust_ids_customer.append(i[0])
-
-cursor_main.execute('select cust_id from leads;')
-rows = cursor_main.fetchall()
-for i in rows:
-    cust_ids_leads.append(i[0])
 
 
 def delete_check():
@@ -584,7 +556,7 @@ def customer_all():
     b5.pack()
     b6.pack()
 
-
+#3 dictionary check for login
 def login():
     global loginwindow, usernameentry, passwordentry, sales_id_user
 
@@ -624,7 +596,8 @@ def login():
 
         messagebox.showinfo("login failed", "incorrect username")
 
-
+#1 after importing
+#just welcome message
 def welcome_page():
     global welcome
 
@@ -650,9 +623,9 @@ def welcome_page():
 
     welcome.mainloop()
 
-
+#2
 def login_front():
-    welcome.destroy()
+    welcome.destroy() #closes welcome on clicking okay
 
     global loginwindow, usernameentry, passwordentry
 
@@ -673,7 +646,7 @@ def login_front():
     Label(loginwindow, text="ENTER PASSWORD", font="Arial,12", bg="Yellow").pack()
 
     passwordentry = Entry(loginwindow)
-    passwordentry.config(show='*')
+    passwordentry.config(show='*') #for hiding password
     passwordentry.pack()
 
     loginbutton = Button(loginwindow, text="LOGIN", command=login, fg="blue")
@@ -778,7 +751,7 @@ def add_leads():
 
         else:
 
-            print('Please enter Valid date')
+            print('Please enter Valid date or select a valid category')
 
     Button(window, text="Save", command=Save).pack(side=BOTTOM)
 
@@ -1276,6 +1249,7 @@ def convert_leads_to_orders():
                 if i in '1234567890':
 
                     check = True
+                    print('check')
 
                 else:
 
@@ -1322,7 +1296,7 @@ def convert_leads_to_orders():
 
                 else:
 
-                    print("Sales cannot be negative. We don't give out loans")
+                    print("Please check again and enter correct values in all the fields")
 
             else:
 
@@ -1457,7 +1431,10 @@ def simple_analytics():
     for i in rows:
         sales_ids_1.append(i[0])
         sales.append(i[1])
+
+    print(sales_ids_1)
     sales_ids_1 = list(map(int, sales_ids_1))
+    print(sales_ids_1)
     sales = list(map(int, sales))
     '''final_dict = dict((x, duplicates(sales_ids_1, x)) for x in set(sales_ids_1) if sales_ids_1.count(x) > 1)
     print(final_dict)'''
@@ -1486,6 +1463,8 @@ def simple_analytics():
     message = "The salesman with maximum sales is:" + string2
     print(message)
     Label(root, text=message).pack()
+
+
 
 
 def see_salesmen():
@@ -1526,7 +1505,7 @@ def manager_page():
     b9.pack()
 
 
-# both are same as customer only small changes
+#4 selection between leads and order
 def selection():
     win = Tk(className='Selection')
     win.geometry("300x170")
@@ -1540,6 +1519,40 @@ def selection():
 
     b1.pack()
     b2.pack()
+
+
+
+
+
+#Table creationa and file creation
+sql_connection = mysql.connect(user="root", password=mysql_password, host=hostname,
+                               port=3306, auth_plugin='mysql_native_password')
+
+cursor_main = sql_connection.cursor()
+
+cursor_main.execute('create database if not exists project')
+
+cursor_main.execute('use project;')
+
+cursor_main.execute(
+    'create table if not exists customer (sales_id varchar(10),cust_id varchar(10) unique,name varchar(100) '
+    ',phone_no varchar(10),email varchar(100),gender varchar(6),address varchar(500),mode varchar('
+    '10),value varchar(10));')
+
+cursor_main.execute(
+    'create table if not exists leads (cust_id varchar(30) unique,name varchar(50),cust_type varchar(50),'
+    'phone_no varchar(10) , '
+    'next_meeting varchar(30));')
+
+cursor_main.execute('select cust_id from customer;')
+rows = cursor_main.fetchall()
+for i in rows:
+    cust_ids_customer.append(i[0])
+
+cursor_main.execute('select cust_id from leads;')
+rows = cursor_main.fetchall()
+for i in rows:
+    cust_ids_leads.append(i[0])
 
 
 try:
