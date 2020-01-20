@@ -917,167 +917,6 @@ def view_sales_manager():
     Button(win, text="Show", command=ShowIt).pack(side=BOTTOM)
 
 
-def update_salesman():
-    update = Toplevel()
-    update.geometry("400x400")
-    update.configure(bg='bisque')
-
-    Label(update, text='UPDATE MENU', bg='Yellow', fg='red').pack()
-
-    lblold = Label(update, text='enter old username which has to be changed')
-    lblold.pack()
-
-    entryold = Entry(update)
-    entryold.pack()
-
-    f = open('users', 'rb+')
-    userdict = p.load(f)
-    f.close()
-
-    f2 = open('salesids1', 'rb+')
-    sales_ids_dict = p.load(f2)
-    f2.close()
-
-    def update_user():
-        global process
-
-        update1 = Toplevel()
-        update1.geometry("400x400")
-        update1.configure(bg='bisque')
-
-        old = entryold.get()
-
-        if old in list(userdict.keys()):
-            lblold = Label(update1, text='enter new username which has to be added')
-            lblold.pack()
-
-            entrynew = Entry(update1)
-            entrynew.pack()
-
-            def process():
-                key_list = []
-                value_list = []
-
-                if entrynew.get() in list(userdict.keys()):
-
-                    print('This user already exists')
-
-                else:
-
-                    if entryold.get() == list(userdict.keys())[0]:
-
-                        print('changing admin')
-
-                        id_sales = sales_ids_dict[old]
-                        password = userdict[old]
-
-                        del userdict[old]
-                        del sales_ids_dict[old]
-
-                        userdict[entrynew.get()] = password
-                        for key, value in userdict.items():
-                            key_list.append(key)
-                            value_list.append(value)
-                        userdict.clear()
-                        dict3 = dict(zip(key_list[::-1], value_list[::-1]))
-
-                        sales_ids_dict[entrynew.get()] = id_sales
-                        key_list.clear()
-                        value_list.clear()
-                        for key, value in sales_ids_dict.items():
-                            key_list.append(key)
-                            value_list.append(value)
-                        sales_ids_dict.clear()
-                        dict4 = dict(zip(key_list[::-1], value_list[::-1]))
-
-                        f = open('users', 'wb+')
-                        f.truncate()
-                        f.seek(0)
-                        p.dump(dict3, f)
-                        f.close()
-
-                        f2 = open('salesids1', 'wb+')
-                        f2.truncate()
-                        f2.seek(0)
-                        p.dump(dict4, f2)
-                        f2.close()
-
-                        print(dict4)
-                        print(dict3)
-
-                    else:
-
-                        id_sales = sales_ids_dict[old]
-                        password = userdict[old]
-
-                        del userdict[old]
-                        del sales_ids_dict[old]
-
-                        userdict[entrynew.get()] = password
-                        sales_ids_dict[entrynew.get()] = id_sales
-
-                        f = open('users', 'wb+')
-                        f.truncate()
-                        f.seek(0)
-                        p.dump(userdict, f)
-                        f.close()
-
-                        f2 = open('salesids1', 'wb+')
-                        f2.truncate()
-                        f2.seek(0)
-                        p.dump(sales_ids_dict, f2)
-                        f2.close()
-
-                        print(userdict)
-                        print(sales_ids_dict)
-
-        else:
-
-            print('username does not exist')
-
-        Button(update1, text='done', command=process).pack()
-
-    def update_password():
-        global process2
-
-        update2 = Toplevel()
-        update2.geometry("400x400")
-        update2.configure(bg='bisque')
-
-        old = entryold.get()
-
-        if old in list(userdict.keys()):
-            lblpassnew = Label(update2, text='enter new password which has to be changed')
-            lblpassnew.pack()
-
-            entrynew = Entry(update2)
-            entrynew.pack()
-
-            def process2():
-                f = open('users', 'rb+')
-                userdict = p.load(f)
-                userdict[old] = entrynew.get()
-
-                f.seek(0)
-                f.truncate()
-                f.seek(0)
-                p.dump(userdict, f)
-                f.flush()
-                f.close()
-
-                print('success')
-                print(userdict)
-
-        else:
-
-            print('username does not exist')
-
-        Button(update2, text='done', command=process2).pack()
-
-    Button(update, text='update user', command=update_user).pack()
-    Button(update, text='update password', command=update_password).pack()
-
-
 def fire_salesman():
     update3 = Toplevel()
     update3.geometry("400x400")
@@ -1485,7 +1324,7 @@ def manager_page():
     lblTitle.pack()
 
     b1 = Button(win, text=" Add Salesman", command=add_salesman, fg="red")
-    b2 = Button(win, text="Update Salesman", command=update_salesman, fg="purple")
+    #b2 = Button(win, text="Update Salesman", command=update_salesman, fg="purple")
     b3 = Button(win, text="Fire Salesman", command=fire_salesman, fg="orange")
     b4 = Button(win, text="View Customer", command=view, fg="green")
     b5 = Button(win, text="View All Customers", command=view_all, fg="blue")
@@ -1495,7 +1334,7 @@ def manager_page():
     b9 = Button(win, text='View Salesman with most sales', command=simple_analytics, fg='cornsilk3')
 
     b1.pack()
-    b2.pack()
+    #b2.pack()
     b3.pack()
     b4.pack()
     b5.pack()
